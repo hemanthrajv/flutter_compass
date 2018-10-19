@@ -14,7 +14,7 @@ class FlutterCompassPlugin private constructor(context: Context, sensorType: Int
   private var mFilter = 1f
   private var sensorEventListener: SensorEventListener? = null
   private val sensorManager: SensorManager
-  private val sensor: Sensor
+  private var sensor: Sensor?
   private val orientation = FloatArray(3)
   private val rMat = FloatArray(9)
 
