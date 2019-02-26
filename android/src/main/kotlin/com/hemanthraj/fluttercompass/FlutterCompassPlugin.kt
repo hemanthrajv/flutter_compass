@@ -33,7 +33,7 @@ class FlutterCompassPlugin private constructor(context: Context, sensorType: Int
 
   override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
     sensorEventListener = createSensorEventListener(events)
-    sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+    sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_UI)
   }
 
   override fun onCancel(arguments: Any?) {
