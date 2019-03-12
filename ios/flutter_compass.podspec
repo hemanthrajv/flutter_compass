@@ -17,5 +17,6 @@ A Flutter compass. The heading varies from 0-360, 0 being north.
   s.dependency 'Flutter'
   
   s.ios.deployment_target = '8.0'
+s.swift_version = '4.2'
 end
 
