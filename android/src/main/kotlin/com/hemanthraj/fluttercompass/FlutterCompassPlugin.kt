@@ -13,21 +13,20 @@ class FlutterCompassPlugin private constructor(context: Context, sensorType: Int
   private var newAzimuth = 0.0 // degree
   private var mFilter = 1f
   private var sensorEventListener: SensorEventListener? = null
-  private val sensorManager: SensorManager
-  private var sensor: Sensor?
+  private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+  private val sensor: Sensor
   private val orientation = FloatArray(3)
   private val rMat = FloatArray(9)
 
   companion object {
     @JvmStatic
-    fun registerWith(registrar: Registrar): Unit {
+    fun registerWith(registrar: Registrar) {
       val channel = EventChannel(registrar.messenger(), "hemanthraj/flutter_compass")
       channel.setStreamHandler(FlutterCompassPlugin(registrar.context(), Sensor.TYPE_ROTATION_VECTOR))
     }
   }
 
   init {
-    sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     sensor = sensorManager.getDefaultSensor(sensorType)
   }
 
@@ -40,7 +39,7 @@ class FlutterCompassPlugin private constructor(context: Context, sensorType: Int
     sensorManager.unregisterListener(sensorEventListener)
   }
 
-  internal fun createSensorEventListener(events: EventChannel.EventSink): SensorEventListener {
+  private fun createSensorEventListener(events: EventChannel.EventSink): SensorEventListener {
     return object : SensorEventListener {
       override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
 
@@ -57,7 +56,7 @@ class FlutterCompassPlugin private constructor(context: Context, sensorType: Int
         }
         mAzimuth = newAzimuth
 
-        events.success(newAzimuth);
+        events.success(newAzimuth)
       }
     }
   }
