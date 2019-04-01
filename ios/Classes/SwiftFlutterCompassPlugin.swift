@@ -9,13 +9,14 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
 
     init(channel: FlutterEventChannel) {
         super.init()
-        let status  = CLLocationManager.authorizationStatus()
-        if (status == .authorizedAlways) {
-            print("status enabled")
-        } else {
-            location.requestAlwaysAuthorization();
-            location.requestWhenInUseAuthorization();
-        }
+        // let status  = CLLocationManager.authorizationStatus()
+        // if (status == .authorizedAlways) {
+        //     print("status enabled")
+        // } else {
+        //     location.requestAlwaysAuthorization();
+        //     location.requestWhenInUseAuthorization();
+        // }
+        
         location.delegate = self
         location.headingFilter = 1;
         channel.setStreamHandler(self);
