@@ -9,14 +9,6 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
 
     init(channel: FlutterEventChannel) {
         super.init()
-        // let status  = CLLocationManager.authorizationStatus()
-        // if (status == .authorizedAlways) {
-        //     print("status enabled")
-        // } else {
-        //     location.requestAlwaysAuthorization();
-        //     location.requestWhenInUseAuthorization();
-        // }
-        
         location.delegate = self
         location.headingFilter = 1;
         channel.setStreamHandler(self);
@@ -46,7 +38,7 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
         if(newHeading.headingAccuracy>0){
             let heading:CLLocationDirection!;
             heading = newHeading.trueHeading > 0 ? newHeading.trueHeading : newHeading.magneticHeading;
-            eventSink!(heading);
+            eventSink?(heading);
         }
     }
 }
