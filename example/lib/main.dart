@@ -3,11 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => new _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -25,17 +25,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Scaffold(
-        appBar: new AppBar(
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
           title: const Text('Flutter Compass'),
         ),
-        body: new Container(
+        body: Container(
           alignment: Alignment.center,
           color: Colors.white,
-          child: new Transform.rotate(
+          child: Transform.rotate(
             angle: ((_direction ?? 0) * (math.pi / 180) * -1),
-            child: new Image.asset('assets/compass.jpg'),
+            child: Image.asset('assets/compass.jpg'),
           ),
         ),
       ),
