@@ -1,4 +1,11 @@
+## 0.3.1
+
+* iOS: Remove permission request when Plugin is instantiated. Library users are
+  responsible to request location permission by themselves.
+* Request permission in the example directly.
+
 ## 0.3.0
+
 * Replace kotlin code with simple java to reduce integration complexity
 
 ## 0.2.0
