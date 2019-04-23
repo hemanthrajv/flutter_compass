@@ -17,6 +17,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _hasPermissions = false;
+  double _lastRead = 0;
+  DateTime _lastReadAt;
 
   @override
   void initState() {
@@ -29,16 +31,57 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text('Flutter Compass'),
         ),
         body: Builder(builder: (context) {
           if (_hasPermissions) {
-            return _buildCompass();
+            return Column(
+              children: <Widget>[
+                _buildManualReader(),
+                Expanded(child: _buildCompass()),
+              ],
+            );
           } else {
             return _buildPermissionSheet();
           }
         }),
+      ),
+    );
+  }
+
+  Widget _buildManualReader() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: <Widget>[
+          RaisedButton(
+            child: Text('Read Value'),
+            onPressed: () async {
+              final double tmp = await FlutterCompass.events.first;
+              setState(() {
+                _lastRead = tmp;
+                _lastReadAt = DateTime.now();
+              });
+            },
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Text(
+                  '$_lastRead',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+                Text(
+                  '$_lastReadAt',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -65,7 +108,6 @@ class _MyAppState extends State<MyApp> {
 
         return Container(
           alignment: Alignment.center,
-          color: Colors.white,
           child: Transform.rotate(
             angle: ((direction ?? 0) * (math.pi / 180) * -1),
             child: Image.asset('assets/compass.jpg'),

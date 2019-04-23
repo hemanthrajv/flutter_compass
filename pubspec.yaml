@@ -1,12 +1,13 @@
 name: flutter_compass
 description: A Flutter compass. The heading varies from 0-360, 0 being north.
-version: 0.3.1
+version: 0.3.2
 author: Hemanth Raj <raj84325@gmail.com>
 homepage: https://github.com/hemanthrajv/flutter_compass
 
 dependencies:
   flutter:
     sdk: flutter
+  rxdart: ^0.21.0
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"

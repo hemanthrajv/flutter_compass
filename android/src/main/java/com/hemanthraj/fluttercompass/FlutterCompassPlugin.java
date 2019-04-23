@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 
 import io.flutter.plugin.common.EventChannel;
@@ -13,7 +14,9 @@ import io.flutter.plugin.common.EventChannel.StreamHandler;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public final class FlutterCompassPlugin implements StreamHandler {
-    private double currentAzimuth;
+    // A static variable which will retain the value across Isolates.
+    private static Double currentAzimuth;
+    
     private double newAzimuth;
     private double filter;
     private SensorEventListener sensorEventListener;
@@ -32,6 +35,9 @@ public final class FlutterCompassPlugin implements StreamHandler {
     public void onListen(Object arguments, EventSink events) {
         sensorEventListener = createSensorEventListener(events);
         sensorManager.registerListener(sensorEventListener, this.sensor, SensorManager.SENSOR_DELAY_UI);
+        if (currentAzimuth != null) {
+            events.success(currentAzimuth);
+        }
     }
 
     public void onCancel(Object arguments) {
@@ -46,7 +52,7 @@ public final class FlutterCompassPlugin implements StreamHandler {
             public void onSensorChanged(SensorEvent event) {
                 SensorManager.getRotationMatrixFromVector(rMat, event.values);
                 newAzimuth = ((Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) + (double) 360) % (double) 360 - Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[2]) + (double) 360) % (double) 360;
-                if (Math.abs(currentAzimuth - newAzimuth) >= filter) {
+                if (currentAzimuth == null || Math.abs(currentAzimuth - newAzimuth) >= filter) {
                     currentAzimuth = newAzimuth;
                     events.success(newAzimuth);
                 }

@@ -1,3 +1,14 @@
+## 0.3.2
+
+* Android: The plugin will now remember the last read azimuth. This will be done
+  across Isolates using a static variable. Additionally, the value is cached 
+  _within_ the isolate with the introduction of a RxDart `BehaviorSubject`.
+  Reading the current azimuth using `await FlutterCompass.events.first` will 
+  therefore not hang anymore when th user has not moved the handset at all.
+* Sample updated to cover the functional updates in Android.
+* Added missing locatio permissions to the Android example which prevented the
+  permission dialog from being shown.
+
 ## 0.3.1
 
 * iOS: Remove permission request when Plugin is instantiated. Library users are
