@@ -1,7 +1,11 @@
+## 0.3.4
+
+* Add `dispose` method 
+
 ## 0.3.3
 
 * Update `permission_handler` to 3.2.2
-* Update `rxdart` to 3.2.2
+* Update `rxdart` to 0.22.3
 
 ## 0.3.2
 

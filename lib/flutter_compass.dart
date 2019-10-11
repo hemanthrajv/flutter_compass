@@ -31,4 +31,9 @@ class FlutterCompass {
 
     return _instance._compassEvents;
   }
+
+  void dispose() {
+    _compassEvents?.close();
+    _compassEvents = null;
+  }
 }
