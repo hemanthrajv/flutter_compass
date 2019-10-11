@@ -1,3 +1,8 @@
+## 0.3.3
+
+* Update `permission_handler` to 3.2.2
+* Update `rxdart` to 3.2.2
+
 ## 0.3.2
 
 * Android: The plugin will now remember the last read azimuth. This will be done
