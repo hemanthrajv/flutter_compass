@@ -1,3 +1,7 @@
+## 0.3.5
+
+* Improve `README.md` 
+
 ## 0.3.4
 
 * Add `dispose` method 
