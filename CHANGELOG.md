@@ -1,4 +1,4 @@
-## 0.3.5
+## 0.3.6
 
 * Upgrade `rxdart` version to `0.23.1` 
 
