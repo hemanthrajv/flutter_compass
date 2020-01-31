@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-
 import 'package:rxdart/subjects.dart';
 
 /// [FlutterCompass] is a singleton class that provides assess to compass events
