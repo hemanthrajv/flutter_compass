@@ -1,5 +1,9 @@
 ## 0.3.5
 
+* Upgrade `rxdart` version to `0.23.1` 
+
+## 0.3.5
+
 * Improve `README.md` 
 
 ## 0.3.4
