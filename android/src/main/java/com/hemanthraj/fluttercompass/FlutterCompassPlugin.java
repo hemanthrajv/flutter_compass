@@ -33,10 +33,17 @@ public final class FlutterCompassPlugin implements StreamHandler {
 
 
     public void onListen(Object arguments, EventSink events) {
-        sensorEventListener = createSensorEventListener(events);
-        sensorManager.registerListener(sensorEventListener, this.sensor, SensorManager.SENSOR_DELAY_UI);
-        if (currentAzimuth != null) {
-            events.success(currentAzimuth);
+        // Added check for the sensor, if null then the device does not have the TYPE_ROTATION_VECTOR sensor
+        if(sensor != null) {
+            sensorEventListener = createSensorEventListener(events);
+            sensorManager.registerListener(sensorEventListener, this.sensor, SensorManager.SENSOR_DELAY_UI);
+            if (currentAzimuth != null) {
+                events.success(currentAzimuth);
+            }
+        } else {
+            // Send null to Flutter side
+            events.success(null);
+//                events.error("Sensor Null", "No sensor was found", "The device does not have any sensor");
         }
     }
 

@@ -94,17 +94,20 @@ class _MyAppState extends State<MyApp> {
           return Text('Error reading heading: ${snapshot.error}');
         }
 
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
-            child: Container(
-              width: 32,
-              height: 32,
-              child: CircularProgressIndicator(),
-            ),
+            child: CircularProgressIndicator(),
           );
         }
 
         double direction = snapshot.data;
+
+        // if direction is null, then device does not support this sensor
+        // show error message
+        if (direction == null)
+          return Center(
+            child: Text("Device does not have sensors !"),
+          );
 
         return Container(
           alignment: Alignment.center,

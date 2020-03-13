@@ -31,13 +31,36 @@ class _MyAppState extends State<MyApp> {
         appBar: new AppBar(
           title: const Text('Flutter Compass'),
         ),
-        body: new Container(
-          alignment: Alignment.center,
-          color: Colors.white,
-          child: new Transform.rotate(
-            angle: ((_direction ?? 0) * (math.pi / 180) * -1),
-            child: new Image.asset('assets/compass.jpg'),
-          ),
+        body: StreamBuilder<double>(
+          stream: FlutterCompass.events,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error reading heading: ${snapshot.error}');
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            double direction = snapshot.data;
+
+            // if direction is null, then device does not support this sensor
+            // show error message
+            if (direction == null)
+              return Center(
+                child: Text("Device does not have sensors !"),
+              );
+
+            return Container(
+              alignment: Alignment.center,
+              child: Transform.rotate(
+                angle: ((direction ?? 0) * (math.pi / 180) * -1),
+                child: Image.asset('assets/compass.jpg'),
+              ),
+            );
+          },
         ),
       ),
     );
