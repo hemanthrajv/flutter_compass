@@ -1,3 +1,7 @@
+## 0.4.1
+
+Updated README.md
+
 ## 0.4.0
 
 **Breaking change:** Uses magnetic heading by default for iOS.
