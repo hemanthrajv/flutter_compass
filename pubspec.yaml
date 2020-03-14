@@ -1,6 +1,6 @@
 name: flutter_compass
 description: A Flutter compass. The heading varies from 0-360, 0 being north.
-version: 0.3.7
+version: 0.4.0
 authors:
   - Hemanth Raj <raj84325@gmail.com>
   - Iurii Dorofeev <otopba@inbox.ru>

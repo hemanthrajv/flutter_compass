@@ -1,3 +1,9 @@
+## 0.4.0
+
+**Breaking change:** Uses magnetic heading by default for iOS.
+
+Older versions used True heading and which caused deviations.
+
 ## 0.3.7
 
 * Sensor check added on android. `null` is returned as direction when no sensor available.
