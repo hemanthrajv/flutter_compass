@@ -4,6 +4,8 @@
 
 A Flutter compass. The heading varies from 0-360, 0 being north.
 
+_Note: `null` is returned as direction on android when no sensor available._
+
 ## Usage
 
 To use this plugin, add `flutter_compass` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
