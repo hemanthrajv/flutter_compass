@@ -1,3 +1,7 @@
+## 0.3.7
+
+* Sensor check added on android. `null` is returned as direction when no sensor available.
+
 ## 0.3.6
 
 * Upgrade `rxdart` version to `0.23.1` 
