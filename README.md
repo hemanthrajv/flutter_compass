@@ -14,7 +14,7 @@ To use this plugin, add `flutter_compass` as a [dependency in your pubspec.yaml 
 
 ```yaml
 dependencies:
-  flutter_compass: '^0.4.0'
+  flutter_compass: '^0.4.1'
 ```
 
 ### iOS
