@@ -4,7 +4,11 @@
 
 A Flutter compass. The heading varies from 0-360, 0 being north.
 
-_Note: `null` is returned as direction on android when no sensor available._
+
+_Note:_
+_Android Only: `null` is returned as direction on android when no sensor available._
+_IOS only: When location info not available, Magnetic heading is returned instead of True heading._
+
 
 ## Usage
 
