@@ -1,3 +1,7 @@
+## 0.4.2+1
+
+Minor fix
+
 ## 0.4.2
 
 Updated rxDart to 0.24.0
