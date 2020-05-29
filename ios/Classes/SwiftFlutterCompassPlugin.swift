@@ -34,7 +34,6 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        print(newHeading.magneticHeading);
         if(newHeading.headingAccuracy>0){
             let heading:CLLocationDirection!;
             heading = newHeading.magneticHeading;
