@@ -28,12 +28,12 @@ public final class FlutterCompassPlugin implements StreamHandler {
 
     public static void registerWith(Registrar registrar) {
         EventChannel channel = new EventChannel(registrar.messenger(), "hemanthraj/flutter_compass");
-        channel.setStreamHandler(new FlutterCompassPlugin(registrar.context(), Sensor.TYPE_ROTATION_VECTOR));
+        channel.setStreamHandler(new FlutterCompassPlugin(registrar.context(), Sensor.TYPE_ROTATION_VECTOR, Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR));
     }
 
 
     public void onListen(Object arguments, EventSink events) {
-        // Added check for the sensor, if null then the device does not have the TYPE_ROTATION_VECTOR sensor
+        // Added check for the sensor, if null then the device does not have the TYPE_ROTATION_VECTOR or TYPE_GEOMAGNETIC_ROTATION_VECTOR sensor
         if(sensor != null) {
             sensorEventListener = createSensorEventListener(events);
             sensorManager.registerListener(sensorEventListener, this.sensor, SensorManager.SENSOR_DELAY_UI);
@@ -67,13 +67,18 @@ public final class FlutterCompassPlugin implements StreamHandler {
         };
     }
 
-    private FlutterCompassPlugin(Context context, int sensorType) {
+    private FlutterCompassPlugin(Context context, int sensorType, int fallbackSensorType) {
         filter = 1.0F;
 
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         orientation = new float[3];
         rMat = new float[9];
-        sensor = this.sensorManager.getDefaultSensor(sensorType);
+        Sensor defaultSensor = this.sensorManager.getDefaultSensor(sensorType);
+        if (defaultSensor != null) {
+            sensor = defaultSensor;
+        } else {
+            sensor = this.sensorManager.getDefaultSensor(fallbackSensorType);
+        }
     }
 
 }
