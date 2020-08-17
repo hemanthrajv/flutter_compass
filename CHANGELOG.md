@@ -1,3 +1,7 @@
+## 0.4.3
+
+Use geomagnetic rotation sensor as fallback on Android
+
 ## 0.4.2+1
 
 Minor fix
