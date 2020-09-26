@@ -54,3 +54,46 @@ public func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocation
     return true
 }
 ```
+
+- `CLHeading` values `x`, `y`, `z` are not related to `CLLocationManager.deviceOrientation`. We tested default value, `faceUp`, `landscapeLeft` and `portrait` and none of them changed the `x,y,z` values. That means the magnetic vector appears to be raw sensor data.
+
+
+### Android Notes
+
+Android only returns raw cartesian coordinate values `(x,y,z)` for geomagnetic sensor and accelerometer.
+
+Android does make a [GeomagneticField](<https://developer.android.com/reference/android/hardware/GeomagneticField#getDeclination()>) class available which takes lat/lon, altitude and time which then provides access to declination / inclination as well as the `(x,y,z)` coordinates for the magnetic field direction.
+
+Android appears to calibrate itself by having the user rotate their phone in a figure eight.
+
+- https://www.youtube.com/watch?v=sP3d00Hr14o
+- https://android.stackexchange.com/a/10148
+
+### Other platforms
+
+- web: 
+  - exposes raw geomagnetic values `(x,y,z)` on [hardly any browsers](https://developer.mozilla.org/en-US/docs/Web/API/Magnetometer)
+  - exposes orientation (accelerometer) rotation values on [most browsers](https://developer.mozilla.org/en-US/docs/Web/API/Detecting_device_orientation)
+- windows ????
+- linux ????
+- macos ????
+
+TLDR: this is going to be Android & iOS only.
+
+### Implementation thoughts
+
+It strikes me as interesting that iOS provides sugar around all these calculations while Android makes you implement them on your own.
+
+I wonder if we're better off passing along the raw cartesian coordinates for geomagnetic sensor, accelerometer, and lat/long/altitude. Then we would do all the calculations in Dart. We're going to have to do the calculations in Android anyway, so might as well implement them in Dart and get feature parity across iOS and Android. This would also make it fairly trivial to add new platforms in the future like web, which only exposes the raw `(x,y,z)` magnetometer vector. (NOTE: we probably won't be supporting web any time soon)
+
+There is an existing dart package called [geomag](https://pub.dev/packages/geomag) which is a port of [geomagJS](https://github.com/cmweiss/geomagJS) and has seemingly reasonable test coverage. This can be used to get the magnetic declination from lat/long/altitude/date allowing us to convert magnetic north to true north. It should be said that we could abdicate the responsibility there to `geomag` instead of building it into this package.
+
+There is also a very thourough stack answer about creating a compass reading that [automatically compensates for tilt and pitch](https://stackoverflow.com/questions/16317599/android-compass-that-can-compensate-for-tilt-and-pitch/16386066#16386066)
+
+Here's an advanced article on [fusing sensors](http://plaw.info/articles/sensorfusion/) in Android to get a real orientation vector.
+
+More references:
+  - https://android-developers.googleblog.com/2010/09/one-screen-turn-deserves-another.html
+  - https://stackoverflow.com/questions/35600583/how-do-i-convert-raw-xyz-magnetometer-data-to-a-heading
+  - https://stackoverflow.com/questions/7877155/how-to-make-an-accurate-compass-on-android/7877688#7877688
+  - https://www.androidcode.ninja/android-compass-code-example/

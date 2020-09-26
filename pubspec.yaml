@@ -9,7 +9,7 @@ dependencies:
   rxdart: ^0.24.1
 
 environment:
-  sdk: ">=2.0.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
   flutter: ">=1.10.0 <2.0.0"
 
 # For information on the generic Dart part of this file, see the

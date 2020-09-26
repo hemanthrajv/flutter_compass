@@ -1,7 +1,17 @@
-class CLHeading {
+import 'package:flutter/foundation.dart';
+import 'package:flutter_compass/sensor_vector_event.dart';
+
+class CLHeading implements SensorVectorEvent {
   /// A carbon copy of `CLHeading` data fields from `CoreLocation` library.
-  CLHeading(this.accuracy, this.magneticHeading, this.timestamp,
-      this.trueHeading, this.x, this.y, this.z);
+  CLHeading({
+    @required this.headingAccuracy,
+    @required this.magneticHeading,
+    @required this.timestamp,
+    @required this.trueHeading,
+    @required this.x,
+    @required this.y,
+    @required this.z,
+  });
 
   /// The maximum deviation (measured in degrees) between the reported heading
   /// and the true geomagnetic heading.
@@ -12,7 +22,7 @@ class CLHeading {
   /// accurate the heading. A negative value means that the reported heading is
   /// invalid, which can occur when the device is uncalibrated or there is strong
   /// interference from local magnetic fields.
-  final double accuracy;
+  final double headingAccuracy;
 
   /// The heading (measured in degrees) relative to magnetic north.
   ///
@@ -54,4 +64,15 @@ class CLHeading {
   ///
   /// This value represents the z-axis deviation from the magnetic field lines being tracked by the device.
   final double z;
+
+  @override
+  String toString() => 'CLHeading('
+      'x:${x.toStringAsPrecision(3)}, '
+      'y:${y.toStringAsPrecision(3)}, '
+      'z:${z.toStringAsPrecision(3)}, '
+      'headingAccuracy:${headingAccuracy.toStringAsPrecision(3)},'
+      'magneticHeading:${magneticHeading.toStringAsPrecision(3)}, '
+      'trueHeading:${trueHeading.toStringAsPrecision(3)}, '
+      'timestamp:$timestamp'
+      ')';
 }
