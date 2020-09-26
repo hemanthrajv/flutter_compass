@@ -17,7 +17,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _hasPermissions = false;
-  PlatformSensorsEvent _lastRead;
+  SensorVectorEvent _lastRead;
   DateTime _lastReadAt;
 
   @override
@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
           RaisedButton(
             child: Text('Read Value'),
             onPressed: () async {
-              final tmp = await FlutterCompass.events.first;
+              final tmp = await FlutterCompass.compassEvents.first;
               setState(() {
                 _lastRead = tmp;
                 _lastReadAt = DateTime.now();
@@ -87,8 +87,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildCompass() {
-    return StreamBuilder<PlatformSensorsEvent>(
-      stream: FlutterCompass.events,
+    return StreamBuilder<SensorVectorEvent>(
+      stream: FlutterCompass.compassEvents,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error reading heading: ${snapshot.error}');
@@ -100,7 +100,7 @@ class _MyAppState extends State<MyApp> {
           );
         }
 
-        PlatformSensorsEvent direction = snapshot.data;
+        SensorVectorEvent direction = snapshot.data;
 
         // if direction is null, then device does not support this sensor
         // show error message

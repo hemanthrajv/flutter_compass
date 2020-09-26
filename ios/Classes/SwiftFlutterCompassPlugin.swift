@@ -2,25 +2,22 @@ import Flutter
 import UIKit
 import CoreLocation
 
-public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, CLLocationManagerDelegate {
+private var location: CLLocationManager = CLLocationManager();
 
-    private var eventSink: FlutterEventSink?;
-    private var location: CLLocationManager = CLLocationManager();
-
-    
-    init(channel: FlutterEventChannel) {
-        super.init()
-        location.delegate = self;
-        location.headingFilter = kCLHeadingFilterNone;
-        
-        channel.setStreamHandler(self);
-    }
-
+public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterEventChannel.init(name: "hemanthraj/flutter_compass", binaryMessenger: registrar.messenger())
-        _ = SwiftFlutterCompassPlugin(channel: channel);
+        let compassHandler = FLTCompassStreamHandler();
+        let compassChannel = FlutterEventChannel.init(name: "com.lukepighetti.compass/compass", binaryMessenger: registrar.messenger());
+        compassChannel.setStreamHandler(compassHandler);
+        
+        location.headingFilter = kCLHeadingFilterNone;
+        location.delegate = compassHandler;
     }
+}
 
+class FLTCompassStreamHandler:NSObject, FlutterStreamHandler, CLLocationManagerDelegate {
+    private var eventSink: FlutterEventSink?;
+    
     public func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = eventSink;
         location.startUpdatingHeading();
@@ -28,15 +25,13 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
     }
 
     public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        eventSink = nil;
         location.stopUpdatingHeading();
+        eventSink = nil;
         return nil;
     }
-
+    
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        eventSink?([
-            "magnetometer": newHeading.asOverloadedSensorVectorEvent,
-        ]);
+        eventSink?(newHeading.asOverloadedSensorVectorEvent);
     }
 }
 

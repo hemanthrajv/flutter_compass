@@ -5,69 +5,47 @@ import 'package:flutter/services.dart';
 import 'package:flutter_compass/graveyard/cl_heading.dart';
 import 'package:rxdart/subjects.dart';
 
-import 'platform_sensors_event.dart';
 import 'sensor_vector_event.dart';
 
-export 'platform_sensors_event.dart';
 export 'sensor_vector_event.dart';
 
 /// [FlutterCompass] is a singleton class that provides assess to compass events
 /// The heading varies from 0-360, 0 being north.
-///
-/// TODO: remove the singleton clutter that we don't need. Can we do this with all static fields?
 class FlutterCompass {
-  static final FlutterCompass _instance = FlutterCompass._();
-
-  factory FlutterCompass() {
-    return _instance;
-  }
-
-  FlutterCompass._();
-
-  static const EventChannel _compassChannel =
-      const EventChannel('hemanthraj/flutter_compass');
-
-  BehaviorSubject<PlatformSensorsEvent> _compassEvents;
+  static const _compassChannel =
+      EventChannel('com.lukepighetti.compass/compass');
+  static BehaviorSubject<SensorVectorEvent> _compassSubject;
 
   /// Provides a [Stream] of compass events that can be listened to.
-  static Stream<PlatformSensorsEvent> get events {
-    if (_instance._compassEvents == null) {
-      _instance._compassEvents = BehaviorSubject<PlatformSensorsEvent>();
-      _instance._compassEvents.addStream(
-        _compassChannel.receiveBroadcastStream().map<PlatformSensorsEvent>(
-          (dynamic data) {
-            print(data);
+  static Stream<SensorVectorEvent> get compassEvents =>
+      _compassSubject ??= BehaviorSubject<SensorVectorEvent>()
+        ..addStream(
+          _compassChannel
+              .receiveBroadcastStream()
+              .map<SensorVectorEvent>(_mapPlatformCompassEvent),
+        );
 
-            if (Platform.isIOS) {
-              return PlatformSensorsEvent(
-                magnetometer: CLHeading(
-                  x: data['magnetometer']['x'],
-                  y: data['magnetometer']['y'],
-                  z: data['magnetometer']['z'],
-                  headingAccuracy: data['magnetometer']['headingAccuracy'],
-                  magneticHeading: data['magnetometer']['magneticHeading'],
-                  timestamp: DateTime.fromMillisecondsSinceEpoch(
-                    ((data['magnetometer']['timestamp'] as double) * 1000)
-                        .toInt(),
-                  ),
-                  trueHeading: data['magnetometer']['trueHeading'],
-                ),
-                accelerometer: null,
-              );
-            }
-            return PlatformSensorsEvent.fromJson(
-              Map<String, dynamic>.from(data),
-            );
-          },
+  /// Convert platform channel data to a compass event, typically [SensorVectorEvent]
+  static SensorVectorEvent _mapPlatformCompassEvent(dynamic data) {
+    if (Platform.isIOS) {
+      return CLHeading(
+        x: data['x'],
+        y: data['y'],
+        z: data['z'],
+        headingAccuracy: data['headingAccuracy'],
+        magneticHeading: data['magneticHeading'],
+        timestamp: DateTime.fromMillisecondsSinceEpoch(
+          ((data['timestamp'] as double) * 1000).toInt(),
         ),
+        trueHeading: data['trueHeading'],
       );
+    } else {
+      throw UnimplementedError("This platform is not yet implemented.");
     }
-
-    return _instance._compassEvents;
   }
 
   void dispose() {
-    _compassEvents?.close();
-    _compassEvents = null;
+    _compassSubject?.close();
+    _compassSubject = null;
   }
 }
