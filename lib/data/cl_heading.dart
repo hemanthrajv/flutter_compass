@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_compass/sensor_vector_event.dart';
+import 'package:flutter_compass/compass_event.dart';
 
-class CLHeading implements SensorVectorEvent {
-  /// A carbon copy of `CLHeading` data fields from `CoreLocation` library.
+class CLHeading implements CompassEvent {
+  /// A carbon copy of `CLHeading` data fields from Apple's `CoreLocation` library.
   CLHeading({
     @required this.headingAccuracy,
     @required this.magneticHeading,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:flutter_compass_example/compass_view.dart';
+import 'package:flutter_compass_example/vector_view.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(MyApp());
@@ -34,39 +36,29 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Builder(builder: (context) {
           if (_hasPermissions) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Text(
-                  "Compass",
-                  style: theme.textTheme.subtitle1,
-                ),
-
-                /// Compass events
-                StreamBuilder(
-                  stream: FlutterCompass.compassEvents,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData == false) return SizedBox.shrink();
-                    return Text(snapshot.data.toString());
-                  },
-                ),
-
-                SizedBox(height: 24),
-
-                Text(
-                  "Raw magnetometer",
-                  style: theme.textTheme.subtitle1,
-                ),
-
-                /// Magnetometer events
-                StreamBuilder(
-                  stream: FlutterCompass.magnetometerEvents,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData == false) return SizedBox.shrink();
-                    return Text(snapshot.data.toString());
-                  },
-                ),
-              ],
+            /// Compass events
+            return StreamBuilder<CompassEvent>(
+              stream: FlutterCompass.compassEvents,
+              initialData: FlutterCompass.compassEvents.value,
+              builder: (context, snapshot) {
+                if (snapshot.hasData == false) return SizedBox.shrink();
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(snapshot.data.toString()),
+                    ),
+                    CompassView(heading: snapshot.data),
+                    SizedBox(height: 12),
+                    VectorView(
+                      x: snapshot.data.x,
+                      y: snapshot.data.y,
+                      z: snapshot.data.z,
+                      max: 60,
+                    ),
+                  ],
+                );
+              },
             );
           } else {
             return _buildPermissionSheet();
