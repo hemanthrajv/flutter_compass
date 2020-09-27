@@ -44,8 +44,36 @@ class FlutterCompass {
     }
   }
 
+  static const _magnetometerChannel =
+      EventChannel('com.lukepighetti.compass/magnetometer');
+  static BehaviorSubject<SensorVectorEvent> _magnetometerSubject;
+
+  /// Provides a [Stream] of magnetometer events that can be listened to.
+  static Stream<SensorVectorEvent> get magnetometerEvents =>
+      _magnetometerSubject ??= BehaviorSubject<SensorVectorEvent>()
+        ..addStream(
+          _magnetometerChannel
+              .receiveBroadcastStream()
+              .map<SensorVectorEvent>(_mapPlatformMagnetometerEvent),
+        );
+
+  /// Convert platform channel data to a magnetometer event, typically [SensorVectorEvent]
+  static SensorVectorEvent _mapPlatformMagnetometerEvent(dynamic data) {
+    if (Platform.isIOS) {
+      return SensorVectorEvent(
+        x: data['x'],
+        y: data['y'],
+        z: data['z'],
+      );
+    } else {
+      throw UnimplementedError("This platform is not yet implemented.");
+    }
+  }
+
   void dispose() {
     _compassSubject?.close();
+    _magnetometerSubject?.close();
     _compassSubject = null;
+    _magnetometerSubject = null;
   }
 }

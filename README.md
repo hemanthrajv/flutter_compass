@@ -57,6 +57,8 @@ public func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocation
 
 - `CLHeading` values `x`, `y`, `z` are not related to `CLLocationManager.deviceOrientation`. We tested default value, `faceUp`, `landscapeLeft` and `portrait` and none of them changed the `x,y,z` values. That means the magnetic vector appears to be raw sensor data.
 
+Magnetometer tutorial: https://www.devfright.com/cmmotionmanager-tutorial-part-3-the-magnetometer/
+
 
 ### Android Notes
 
