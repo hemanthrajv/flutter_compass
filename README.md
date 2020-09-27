@@ -58,7 +58,10 @@ public func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocation
 - `CLHeading` values `x`, `y`, `z` are not related to `CLLocationManager.deviceOrientation`. We tested default value, `faceUp`, `landscapeLeft` and `portrait` and none of them changed the `x,y,z` values. That means the magnetic vector appears to be raw sensor data.
 
 Magnetometer tutorial: https://www.devfright.com/cmmotionmanager-tutorial-part-3-the-magnetometer/
+A complete breakdown of the three different ways to get magnetometer data from iOS and how they relate to eachother: https://stackoverflow.com/a/15470571
 
+
+We tried getting raw magnetometer vector from CLHeading (these were the best by far), `CMMotionManager.startMagnetometerUpdates` (these didn't appear to filter device magnetic field) and `CMMotionManager.startDeviceMotionUpdates` (which didn't provide any data, but did fire events.) We created a Stack issue to track this. https://stackoverflow.com/questions/64093436/ios-magnetometer-vector-has-unexpected-values
 
 ### Android Notes
 

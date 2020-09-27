@@ -43,8 +43,6 @@ class FLTCompassStreamHandler:NSObject, FlutterStreamHandler, CLLocationManagerD
     }
 }
 
-
-
 class FLTMagnetometerStreamHandler:NSObject, FlutterStreamHandler {
     private var eventSink: FlutterEventSink?;
     
@@ -53,7 +51,26 @@ class FLTMagnetometerStreamHandler:NSObject, FlutterStreamHandler {
         motion.startMagnetometerUpdates(to: OperationQueue(), withHandler: { (data:CMMagnetometerData?, error:Error?) in
             let field = data?.magneticField;
             eventSink(field?.asSensorVectorEvent);
-          })
+        })
+        return nil;
+    }
+
+    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        motion.stopMagnetometerUpdates();
+        eventSink = nil;
+        return nil;
+    }
+}
+
+class FLTCalibratedMagnetometerStreamHandler:NSObject, FlutterStreamHandler {
+    private var eventSink: FlutterEventSink?;
+    
+    public func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
+        self.eventSink = eventSink;
+        motion.startDeviceMotionUpdates(to: OperationQueue(), withHandler: { (data:CMDeviceMotion?, error:Error?) in
+            let field = data?.magneticField.field;
+            eventSink(field?.asSensorVectorEvent);
+        })
         return nil;
     }
 
@@ -90,7 +107,3 @@ extension CMMagneticField {
         ]
     }
 }
-
-
-
-
