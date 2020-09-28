@@ -26,8 +26,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Colors.white,
@@ -37,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         body: Builder(builder: (context) {
           if (_hasPermissions) {
             /// Compass events
-            return StreamBuilder<CompassEvent>(
+            return StreamBuilder<CompassHeading>(
               stream: FlutterCompass.compassEvents,
               initialData: FlutterCompass.compassEvents.value,
               builder: (context, snapshot) {

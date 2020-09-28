@@ -5,28 +5,28 @@ import 'package:flutter/services.dart';
 import 'package:flutter_compass/data/cl_heading.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'compass_event.dart';
+import 'compass_heading.dart';
 
-export 'compass_event.dart';
+export 'compass_heading.dart';
 
 /// [FlutterCompass] is a singleton class that provides assess to compass events
 /// The heading varies from 0-360, 0 being north.
 class FlutterCompass {
   static const _compassChannel =
       EventChannel('com.lukepighetti.compass/compass');
-  static BehaviorSubject<CompassEvent> _compassSubject;
+  static BehaviorSubject<CompassHeading> _compassSubject;
 
   /// Provides a [Stream] of compass events that can be listened to.
-  static ValueStream<CompassEvent> get compassEvents =>
-      _compassSubject ??= BehaviorSubject<CompassEvent>()
+  static ValueStream<CompassHeading> get compassEvents =>
+      _compassSubject ??= BehaviorSubject<CompassHeading>()
         ..addStream(
           _compassChannel
               .receiveBroadcastStream()
-              .map<CompassEvent>(_mapPlatformCompassEvent),
+              .map<CompassHeading>(_mapPlatformCompassEvent),
         );
 
-  /// Convert platform channel data to a compass event, typically [CompassEvent]
-  static CompassEvent _mapPlatformCompassEvent(dynamic data) {
+  /// Convert platform channel data to a compass event, typically [CompassHeading]
+  static CompassHeading _mapPlatformCompassEvent(dynamic data) {
     if (Platform.isIOS) {
       return CLHeading(
         x: data['x'],
@@ -46,6 +46,9 @@ class FlutterCompass {
 
   void dispose() {
     _compassSubject?.close();
+
+    /// Lazy initialized subjects should be set to null after closing
+    /// so they can be recreated after being disposed.
     _compassSubject = null;
   }
 }

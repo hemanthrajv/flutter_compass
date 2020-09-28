@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_compass/compass_event.dart';
+import 'package:flutter_compass/compass_heading.dart';
 
-class CLHeading implements CompassEvent {
+class CLHeading implements CompassHeading {
   /// A carbon copy of `CLHeading` data fields from Apple's `CoreLocation` library.
   CLHeading({
     @required this.headingAccuracy,

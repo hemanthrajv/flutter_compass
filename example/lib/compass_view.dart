@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+
 import 'extensions.dart';
 
 class CompassView extends StatelessWidget {
@@ -11,7 +10,7 @@ class CompassView extends StatelessWidget {
   }) : super(key: key);
 
   /// The heading to draw a compass with.
-  final CompassEvent heading;
+  final CompassHeading heading;
 
   @override
   Widget build(BuildContext context) {

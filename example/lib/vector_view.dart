@@ -1,10 +1,9 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import 'extensions.dart';
 
 class VectorView extends StatelessWidget {
+  /// Display an `(x,y,z)` axis diagram showing the magnitude of the vector components.
   const VectorView({
     @required this.x,
     @required this.y,
@@ -40,8 +39,10 @@ class VectorView extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: SizedBox(
-                      width: 60, child: Text("Y ${y.toStringAsPrecision(2)}"))
-                  .nudge(x: 24, y: 12),
+                width: 60,
+                child:
+                    Text("Y ${y.toStringAsPrecision(2)}").nudge(x: 24, y: 12),
+              ),
             ),
             Align(
               alignment: Alignment.bottomLeft,
@@ -55,25 +56,39 @@ class VectorView extends StatelessWidget {
 }
 
 class _VectorPainter extends CustomPainter {
+  /// Paints the axes given `x`, `y`, `z` and `max` axis extent.
   _VectorPainter(this.x, this.y, this.z, this.max);
 
+  /// The `x` component of the vector.
   final double x;
+
+  /// The `y` component of the vector.
   final double y;
+
+  /// The `z` component of the vector.
   final double z;
+
+  /// The maximum axis extent, to be used by all three axes.
+  ///
+  /// If it's null, we will use the maximum of `x`, `y` and `z` instead.
   final double max;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final strokeWidth = 2.0;
+
+    /// Setup paints
     final axisPaint = Paint()
       ..color = Colors.grey.shade300
-      ..strokeWidth = 2.0
+      ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
     final valuePaint = Paint()
       ..color = Colors.red
-      ..strokeWidth = 2.0
+      ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
+    /// Setup center offset, radius, and axes extents directions
     final center = size.center(Offset.zero);
     final radius = size.shortestSide / 2;
 
@@ -97,7 +112,7 @@ class _VectorPainter extends CustomPainter {
     canvas.drawLine(center, xExtent, axisPaint);
 
     /// Calculate value extents
-    final maxValue = max ?? math.max(math.max(x.abs(), y.abs()), z.abs());
+    final maxValue = max ?? [x.abs(), y.abs(), z.abs()].max;
     final zRadius = z / maxValue * radius;
     final yRadius = y / maxValue * radius;
     final xRadius = x / maxValue * radius;
@@ -118,5 +133,6 @@ class _VectorPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _VectorPainter old) =>
+      old.x != x || old.y != y || old.z != z || old.max != max;
 }
