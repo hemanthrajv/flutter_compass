@@ -40,7 +40,16 @@ class FlutterCompass {
         trueHeading: data['trueHeading'],
       );
     } else {
-      throw UnimplementedError("This platform is not yet implemented.");
+      print(data);
+      return CLHeading(
+        x: -1,
+        y: -1,
+        z: -1,
+        headingAccuracy: -1,
+        magneticHeading: -1,
+        timestamp: DateTime.now(),
+        trueHeading: -1,
+      );
     }
   }
 

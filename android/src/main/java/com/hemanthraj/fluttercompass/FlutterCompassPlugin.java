@@ -5,80 +5,144 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 
+import androidx.annotation.NonNull;
+
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-
-public final class FlutterCompassPlugin implements StreamHandler {
-    // A static variable which will retain the value across Isolates.
-    private static Double currentAzimuth;
-    
-    private double newAzimuth;
-    private double filter;
-    private SensorEventListener sensorEventListener;
-
-    private final SensorManager sensorManager;
-    private final Sensor sensor;
-    private final float[] orientation;
-    private final float[] rMat;
-
-    public static void registerWith(Registrar registrar) {
-        EventChannel channel = new EventChannel(registrar.messenger(), "hemanthraj/flutter_compass");
-        channel.setStreamHandler(new FlutterCompassPlugin(registrar.context(), Sensor.TYPE_ROTATION_VECTOR, Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR));
-    }
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 
 
-    public void onListen(Object arguments, EventSink events) {
-        // Added check for the sensor, if null then the device does not have the TYPE_ROTATION_VECTOR or TYPE_GEOMAGNETIC_ROTATION_VECTOR sensor
-        if(sensor != null) {
-            sensorEventListener = createSensorEventListener(events);
-            sensorManager.registerListener(sensorEventListener, this.sensor, SensorManager.SENSOR_DELAY_UI);
-            if (currentAzimuth != null) {
-                events.success(currentAzimuth);
-            }
-        } else {
-            // Send null to Flutter side
-            events.success(null);
-//                events.error("Sensor Null", "No sensor was found", "The device does not have any sensor");
-        }
-    }
+public class FlutterCompassPlugin implements FlutterPlugin, SensorEventListener, MethodCallHandler, StreamHandler {
+    private EventSink sink;
+    private SensorManager sensorManager;
+    private final float[] accelerometerReading = new float[3];
+    private final float[] magnetometerReading = new float[3];
 
-    public void onCancel(Object arguments) {
-        this.sensorManager.unregisterListener(this.sensorEventListener);
-    }
+    private final float[] rotationMatrix = new float[9];
+    private final float[] orientationAngles = new float[3];
 
-    private SensorEventListener createSensorEventListener(final EventSink events) {
-        return new SensorEventListener() {
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            }
 
-            public void onSensorChanged(SensorEvent event) {
-                SensorManager.getRotationMatrixFromVector(rMat, event.values);
-                newAzimuth = ((Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) + (double) 360) % (double) 360 - Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[2]) + (double) 360) % (double) 360;
-                if (currentAzimuth == null || Math.abs(currentAzimuth - newAzimuth) >= filter) {
-                    currentAzimuth = newAzimuth;
-                    events.success(newAzimuth);
-                }
-            }
-        };
-    }
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        EventChannel channel = new EventChannel(binding.getBinaryMessenger(), "com.lukepighetti.compass/compass");
+        channel.setStreamHandler(this);
 
-    private FlutterCompassPlugin(Context context, int sensorType, int fallbackSensorType) {
-        filter = 1.0F;
-
+        Context context = binding.getApplicationContext();
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        orientation = new float[3];
-        rMat = new float[9];
-        Sensor defaultSensor = this.sensorManager.getDefaultSensor(sensorType);
-        if (defaultSensor != null) {
-            sensor = defaultSensor;
-        } else {
-            sensor = this.sensorManager.getDefaultSensor(fallbackSensorType);
+
+        // Get updates from the accelerometer and magnetometer at a constant rate.
+        // To make batch operations more efficient and reduce power consumption,
+        // provide support for delaying updates to the application.
+        //
+        // In this example, the sensor reporting delay is small enough such that
+        // the application receives an update before the system checks the sensor
+        // readings again.
+        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        if (accelerometer != null) {
+            sensorManager.registerListener(this, accelerometer,
+                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         }
+
+        if (magneticField != null) {
+            sensorManager.registerListener(this, magneticField,
+                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+        }
+
     }
 
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        // Don't receive any more updates from either sensor.
+        sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+        result.notImplemented();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        // Get updates from the accelerometer and magnetometer at a constant rate.
+//        // To make batch operations more efficient and reduce power consumption,
+//        // provide support for delaying updates to the application.
+//        //
+//        // In this example, the sensor reporting delay is small enough such that
+//        // the application receives an update before the system checks the sensor
+//        // readings again.
+//        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+//        if (accelerometer != null) {
+//            sensorManager.registerListener(this, accelerometer,
+//                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+//        }
+//        Sensor magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+//        if (magneticField != null) {
+//            sensorManager.registerListener(this, magneticField,
+//                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+//        }
+//    }
+
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//
+//        // Don't receive any more updates from either sensor.
+//        sensorManager.unregisterListener(this);
+//    }
+
+
+    // Get readings from accelerometer and magnetometer. To simplify calculations,
+    // consider storing these readings as unit vectors.
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            System.arraycopy(event.values, 0, accelerometerReading,
+                    0, accelerometerReading.length);
+        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            System.arraycopy(event.values, 0, magnetometerReading,
+                    0, magnetometerReading.length);
+        }
+
+        updateOrientationAngles();
+        sink.success(true);
+    }
+
+    // Compute the three orientation angles based on the most recent readings from
+    // the device's accelerometer and magnetometer.
+    public void updateOrientationAngles() {
+        // Update rotation matrix, which is needed to update orientation angles.
+        SensorManager.getRotationMatrix(rotationMatrix, null,
+                accelerometerReading, magnetometerReading);
+
+        // "rotationMatrix" now has up-to-date information.
+
+        SensorManager.getOrientation(rotationMatrix, orientationAngles);
+
+        // "orientationAngles" now has up-to-date information.
+    }
+
+
+    @Override
+    public void onListen(Object arguments, EventSink events) {
+        sink = events;
+    }
+
+    @Override
+    public void onCancel(Object arguments) {
+        sink = null;
+    }
 }
