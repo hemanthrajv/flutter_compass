@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:compass/compass.dart';
 import 'package:compass_example/compass_view.dart';
 import 'package:compass_example/vector_view.dart';
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(MyApp());
@@ -50,12 +52,30 @@ class _MyAppState extends State<MyApp> {
                   ),
                   CompassView(heading: snapshot.data),
                   SizedBox(height: 12),
-                  VectorView(
-                    x: snapshot.data.x,
-                    y: snapshot.data.y,
-                    z: snapshot.data.z,
-                    max: 60,
-                  ),
+                  if (Platform.isIOS)
+                    VectorView(
+                      x: snapshot.data.x,
+                      y: snapshot.data.y,
+                      z: snapshot.data.z,
+                      max: 60,
+                    )
+                  else if (Platform.isAndroid)
+                    Row(
+                      children: [
+                        VectorView(
+                          x: (snapshot.data as AndroidHeading).accelerometerX,
+                          y: (snapshot.data as AndroidHeading).accelerometerY,
+                          z: (snapshot.data as AndroidHeading).accelerometerZ,
+                          max: 10,
+                        ),
+                        VectorView(
+                          x: (snapshot.data as AndroidHeading).magnetometerX,
+                          y: (snapshot.data as AndroidHeading).magnetometerY,
+                          z: (snapshot.data as AndroidHeading).magnetometerZ,
+                          max: 100,
+                        )
+                      ],
+                    ),
                 ],
               );
             },
@@ -73,20 +93,16 @@ class _MyAppState extends State<MyApp> {
           Text('Location Permission Required'),
           RaisedButton(
             child: Text('Request Permissions'),
-            onPressed: () {
-              PermissionHandler().requestPermissions(
-                  [PermissionGroup.locationWhenInUse]).then((ignored) {
-                _fetchPermissionStatus();
-              });
+            onPressed: () async {
+              await Permission.locationWhenInUse.request();
+              await _fetchPermissionStatus();
             },
           ),
           SizedBox(height: 16),
           RaisedButton(
             child: Text('Open App Settings'),
-            onPressed: () {
-              PermissionHandler().openAppSettings().then((opened) {
-                //
-              });
+            onPressed: () async {
+              await openAppSettings();
             },
           )
         ],
@@ -94,13 +110,16 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void _fetchPermissionStatus() {
-    PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.locationWhenInUse)
-        .then((status) {
-      if (mounted) {
-        setState(() => _hasPermissions = status == PermissionStatus.granted);
-      }
+  /// Fetch the status of [Permission.locationWhenInUse] and
+  /// update [_hasPermissions] accordingly.
+  Future<void> _fetchPermissionStatus() async {
+    final status = await Permission.locationWhenInUse.status;
+
+    /// Guard this screen is not mounted
+    if (!mounted) return;
+
+    setState(() {
+      _hasPermissions = status == PermissionStatus.granted;
     });
   }
 }

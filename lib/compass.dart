@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
+import 'package:compass/data/android_heading.dart';
 import 'package:compass/data/cl_heading.dart';
+import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'compass_heading.dart';
 
 export 'compass_heading.dart';
+export 'data/android_heading.dart';
+export 'data/cl_heading.dart';
 
 /// [FlutterCompass] is a singleton class that provides assess to compass events
 /// The heading varies from 0-360, 0 being north.
@@ -39,17 +42,18 @@ class FlutterCompass {
         ),
         trueHeading: data['trueHeading'],
       );
-    } else {
-      print(data);
-      return CLHeading(
-        x: -1,
-        y: -1,
-        z: -1,
-        headingAccuracy: -1,
-        magneticHeading: -1,
+    } else if (Platform.isAndroid) {
+      return AndroidHeading(
         timestamp: DateTime.now(),
-        trueHeading: -1,
+        accelerometerX: data['a_x'],
+        accelerometerY: data['a_y'],
+        accelerometerZ: data['a_z'],
+        magnetometerX: data['m_x'],
+        magnetometerY: data['m_y'],
+        magnetometerZ: data['m_z'],
       );
+    } else {
+      throw UnimplementedError("Platform is not implemented.");
     }
   }
 
