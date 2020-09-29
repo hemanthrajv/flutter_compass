@@ -2,20 +2,26 @@ PODS:
   - compass (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - permission_handler (3.3.0):
+    - Flutter
 
 DEPENDENCIES:
   - compass (from `.symlinks/plugins/compass/ios`)
   - Flutter (from `Flutter`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
 
 EXTERNAL SOURCES:
   compass:
     :path: ".symlinks/plugins/compass/ios"
   Flutter:
     :path: Flutter
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
 
 SPEC CHECKSUMS:
   compass: e99c26598694570c5dfaca0080b0871659717e87
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  permission_handler: 67637977b227d62d46bfbf524f335f8568de5a73
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 

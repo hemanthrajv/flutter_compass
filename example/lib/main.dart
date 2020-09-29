@@ -1,58 +1,107 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:compass/compass.dart';
+import 'package:compass_example/compass_view.dart';
+import 'package:compass_example/vector_view.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
+  const MyApp({
+    Key key,
+  }) : super(key: key);
+
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  bool _hasPermissions = false;
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await Compass.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+    _fetchPermissionStatus();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Flutter Compass'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+        body: Builder(builder: (context) {
+          if (_hasPermissions) {
+            /// Compass events
+            return StreamBuilder<CompassHeading>(
+              stream: FlutterCompass.compassEvents,
+              initialData: FlutterCompass.compassEvents.value,
+              builder: (context, snapshot) {
+                if (snapshot.hasData == false) return SizedBox.shrink();
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(snapshot.data.toString()),
+                    ),
+                    CompassView(heading: snapshot.data),
+                    SizedBox(height: 12),
+                    VectorView(
+                      x: snapshot.data.x,
+                      y: snapshot.data.y,
+                      z: snapshot.data.z,
+                      max: 60,
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            return _buildPermissionSheet();
+          }
+        }),
       ),
     );
+  }
+
+  Widget _buildPermissionSheet() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text('Location Permission Required'),
+          RaisedButton(
+            child: Text('Request Permissions'),
+            onPressed: () {
+              PermissionHandler().requestPermissions(
+                  [PermissionGroup.locationWhenInUse]).then((ignored) {
+                _fetchPermissionStatus();
+              });
+            },
+          ),
+          SizedBox(height: 16),
+          RaisedButton(
+            child: Text('Open App Settings'),
+            onPressed: () {
+              PermissionHandler().openAppSettings().then((opened) {
+                //
+              });
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  void _fetchPermissionStatus() {
+    PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.locationWhenInUse)
+        .then((status) {
+      if (mounted) {
+        setState(() => _hasPermissions = status == PermissionStatus.granted);
+      }
+    });
   }
 }
