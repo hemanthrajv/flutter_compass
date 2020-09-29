@@ -12,10 +12,18 @@ class VectorView extends StatelessWidget {
     Key key,
   }) : super(key: key);
 
+  /// The `x` component of the vector.
   final double x;
+
+  /// The `y` component of the vector.
   final double y;
+
+  /// The `z` component of the vector.
   final double z;
 
+  /// The maximum axis extent, to be used by all three axes.
+  ///
+  /// If it's null, we will use the maximum of `x`, `y` and `z` instead.
   final double max;
 
   @override

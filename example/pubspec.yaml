@@ -1,6 +1,5 @@
 name: compass_example
 description: Demonstrates how to use the compass plugin.
-
 publish_to: "none"
 
 environment:

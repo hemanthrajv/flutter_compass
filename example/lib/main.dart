@@ -33,34 +33,33 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Flutter Compass'),
         ),
         body: Builder(builder: (context) {
-          if (_hasPermissions) {
-            /// Compass events
-            return StreamBuilder<CompassHeading>(
-              stream: FlutterCompass.compassEvents,
-              initialData: FlutterCompass.compassEvents.value,
-              builder: (context, snapshot) {
-                if (snapshot.hasData == false) return SizedBox.shrink();
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(snapshot.data.toString()),
-                    ),
-                    CompassView(heading: snapshot.data),
-                    SizedBox(height: 12),
-                    VectorView(
-                      x: snapshot.data.x,
-                      y: snapshot.data.y,
-                      z: snapshot.data.z,
-                      max: 60,
-                    ),
-                  ],
-                );
-              },
-            );
-          } else {
-            return _buildPermissionSheet();
-          }
+          /// Guard no permissions
+          if (_hasPermissions == false) return _buildPermissionSheet();
+
+          /// Compass events
+          return StreamBuilder<CompassHeading>(
+            stream: FlutterCompass.compassEvents,
+            initialData: FlutterCompass.compassEvents.value,
+            builder: (context, snapshot) {
+              if (snapshot.hasData == false) return SizedBox.shrink();
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(snapshot.data.toString()),
+                  ),
+                  CompassView(heading: snapshot.data),
+                  SizedBox(height: 12),
+                  VectorView(
+                    x: snapshot.data.x,
+                    y: snapshot.data.y,
+                    z: snapshot.data.z,
+                    max: 60,
+                  ),
+                ],
+              );
+            },
+          );
         }),
       ),
     );

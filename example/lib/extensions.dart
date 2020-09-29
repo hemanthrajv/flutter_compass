@@ -16,7 +16,7 @@ extension WidgetX on Widget {
       Transform.translate(offset: Offset(x, y), child: this);
 }
 
-extension ListDoubleX on Iterable<double> {
+extension IterableDoubleX on Iterable<double> {
   /// The maximum value in this iterable
   double get max => reduce((a, b) => math.max(a, b));
 }
