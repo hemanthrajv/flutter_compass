@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:compass/data/android_heading.dart';
 import 'package:compass/data/cl_heading.dart';
@@ -32,25 +33,24 @@ class FlutterCompass {
   static CompassHeading _mapPlatformCompassEvent(dynamic data) {
     if (Platform.isIOS) {
       return CLHeading(
+        magneticHeading: data['magneticHeading'],
+        trueHeading: data['trueHeading'],
+        headingAccuracy: data['headingAccuracy'],
         x: data['x'],
         y: data['y'],
         z: data['z'],
-        headingAccuracy: data['headingAccuracy'],
-        magneticHeading: data['magneticHeading'],
         timestamp: DateTime.fromMillisecondsSinceEpoch(
           ((data['timestamp'] as double) * 1000).toInt(),
         ),
-        trueHeading: data['trueHeading'],
       );
     } else if (Platform.isAndroid) {
       return AndroidHeading(
+        magneticHeading: data['magneticHeading'],
+        trueHeading: -1,
+        x: data['x'],
+        y: data['y'],
+        z: data['z'],
         timestamp: DateTime.now(),
-        accelerometerX: data['a_x'],
-        accelerometerY: data['a_y'],
-        accelerometerZ: data['a_z'],
-        magnetometerX: data['m_x'],
-        magnetometerY: data['m_y'],
-        magnetometerZ: data['m_z'],
       );
     } else {
       throw UnimplementedError("Platform is not implemented.");

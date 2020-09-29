@@ -41,6 +41,8 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
     private final float[] rotationMatrix = new float[9];
     private final float[] orientationAngles = new float[3];
 
+    private final AngleLowpassFilter azimuthLowpass = new AngleLowpassFilter();
+
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "compass");
@@ -107,13 +109,15 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
         updateOrientationAngles();
 
         HashMap<String, Object> response = new HashMap<String, Object>();
-        response.put("a_x", accelerometerReading[0]);
-        response.put("a_y", accelerometerReading[1]);
-        response.put("a_z", accelerometerReading[2]);
 
-        response.put("m_x", magnetometerReading[0]);
-        response.put("m_y", magnetometerReading[1]);
-        response.put("m_z", magnetometerReading[2]);
+        final float azimuth = orientationAngles[0];
+        azimuthLowpass.add(azimuth);
+
+        response.put("magneticHeading", Math.toDegrees(azimuthLowpass.average()));
+        response.put("trueHeading", -1.0);
+        response.put("x", magnetometerReading[0]);
+        response.put("y", magnetometerReading[1]);
+        response.put("z", magnetometerReading[2]);
 
         if (sink != null)
             sink.success(response);
@@ -141,3 +145,5 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
         sink = null;
     }
 }
+
+

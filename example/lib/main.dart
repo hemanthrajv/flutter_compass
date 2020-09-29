@@ -1,12 +1,26 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:compass/compass.dart';
 import 'package:compass_example/compass_view.dart';
+import 'package:compass_example/extensions.dart';
 import 'package:compass_example/vector_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  /// Make sure the platform binding is setup so we can use
+  /// platfom channels before using [runApp]
+  WidgetsFlutterBinding.ensureInitialized();
+
+  /// Setup device orientation so it doesn't rotate to something we don't support
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({
@@ -60,21 +74,11 @@ class _MyAppState extends State<MyApp> {
                       max: 60,
                     )
                   else if (Platform.isAndroid)
-                    Row(
-                      children: [
-                        VectorView(
-                          x: (snapshot.data as AndroidHeading).accelerometerX,
-                          y: (snapshot.data as AndroidHeading).accelerometerY,
-                          z: (snapshot.data as AndroidHeading).accelerometerZ,
-                          max: 10,
-                        ),
-                        VectorView(
-                          x: (snapshot.data as AndroidHeading).magnetometerX,
-                          y: (snapshot.data as AndroidHeading).magnetometerY,
-                          z: (snapshot.data as AndroidHeading).magnetometerZ,
-                          max: 100,
-                        )
-                      ],
+                    VectorView(
+                      x: snapshot.data.x,
+                      y: snapshot.data.y,
+                      z: snapshot.data.z,
+                      max: 60,
                     ),
                 ],
               );

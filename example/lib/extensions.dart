@@ -8,6 +8,9 @@ extension NumX on num {
 
   /// Convert degrees to radians
   double get degrees => this.asRadians;
+
+  /// Convert radians into degrees
+  double get asDegrees => this * 380 / (2 * math.pi);
 }
 
 extension WidgetX on Widget {

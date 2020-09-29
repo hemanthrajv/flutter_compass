@@ -102,3 +102,14 @@ More references:
   - https://stackoverflow.com/questions/35600583/how-do-i-convert-raw-xyz-magnetometer-data-to-a-heading
   - https://stackoverflow.com/questions/7877155/how-to-make-an-accurate-compass-on-android/7877688#7877688
   - https://www.androidcode.ninja/android-compass-code-example/
+
+
+### Stability
+
+The CoreMotion iOS implementation appears to have considerably signal processing / filtering wizardry going on behind the scenes. Compared to the Android getOrientation azimuth value with a naiive low-pass filter, the iOS implementation is about 5x faster and simply cannot be thrown off with an external magnet.
+
+Android uses the accelerometer and the magnetometer to figure out the azimuth (magneticHeading). I suspect that iOS does as well, but then also uses the gyroscope to detect rate of rotation, allowing it to essentially say "hey, this device isn't rotating, magnetic north probably shouldn't either." The result is Android implementation is easy to throw off with an external magnet, iOS is almost impossible to do so. iOS is also waaaay more responsive, so I imagine they are using the gyroscope for that initial rotation acceleration, after which the magnetometer takes over to handle the drift.
+
+Suffice to say that unless some professional signal processing engineer shows up to help open source compass implementations, Android compasses on any platform will never perform with the incredible speed and accuracy of Apple open source compass implementations.
+
+The author of this link http://plaw.info/articles/sensorfusion/ discusses sensor fusing and even offers an implementation in Java for Android that may be worth trying to get working.
