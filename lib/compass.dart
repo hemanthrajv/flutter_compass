@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:compass/data/android_heading.dart';
 import 'package:compass/data/cl_heading.dart';
@@ -46,7 +45,7 @@ class FlutterCompass {
     } else if (Platform.isAndroid) {
       return AndroidHeading(
         magneticHeading: data['magneticHeading'],
-        trueHeading: -1,
+        trueHeading: data['trueHeading'],
         x: data['x'],
         y: data['y'],
         z: data['z'],

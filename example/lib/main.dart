@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:compass/compass.dart';
 import 'package:compass_example/compass_view.dart';
-import 'package:compass_example/extensions.dart';
 import 'package:compass_example/vector_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

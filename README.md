@@ -113,3 +113,7 @@ Android uses the accelerometer and the magnetometer to figure out the azimuth (m
 Suffice to say that unless some professional signal processing engineer shows up to help open source compass implementations, Android compasses on any platform will never perform with the incredible speed and accuracy of Apple open source compass implementations.
 
 The author of this link http://plaw.info/articles/sensorfusion/ discusses sensor fusing and even offers an implementation in Java for Android that may be worth trying to get working.
+
+## Inversion toggle
+
+On iOS if you don't set a device orientation it handles device inversion very gracefully. On Android, with the implementation provided by Google's documentation, when the device goes above or below vertical it creates a violent inversion toggle that flips the compass 180°.

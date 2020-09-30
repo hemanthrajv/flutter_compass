@@ -13,17 +13,23 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 import android.content.Context;
+import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.HashMap;
 
 /**
  * CompassPlugin
  */
-public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEventListener, StreamHandler {
+public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEventListener, StreamHandler, OnSuccessListener<Location> {
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -35,6 +41,7 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
 
     /// The sensor manager that we use to access the magnetometer and gyroscope
     private SensorManager sensorManager;
+    private FusedLocationProviderClient locationClient;
 
     private final float[] accelerometerReading = new float[3];
     private final float[] magnetometerReading = new float[3];
@@ -42,6 +49,8 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
     private final float[] orientationAngles = new float[3];
 
     private final AngleLowpassFilter azimuthLowpass = new AngleLowpassFilter(200);
+
+    private Location location;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -53,6 +62,7 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
 
         Context context = flutterPluginBinding.getApplicationContext();
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        locationClient = LocationServices.getFusedLocationProviderClient(context);
 
         // Get updates from the accelerometer and magnetometer at a constant rate.
         // To make batch operations more efficient and reduce power consumption,
@@ -74,6 +84,7 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
                     SensorManager.SENSOR_DELAY_FASTEST, SensorManager.SENSOR_DELAY_UI);
         }
 
+        locationClient.getLastLocation().addOnSuccessListener(this);
     }
 
     @Override
@@ -112,9 +123,21 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
 
         final float azimuth = orientationAngles[0];
         azimuthLowpass.add(azimuth);
+        final double magneticHeading = Math.toDegrees(azimuthLowpass.average());
 
-        response.put("magneticHeading", Math.toDegrees(azimuthLowpass.average()));
-        response.put("trueHeading", -1.0);
+        response.put("magneticHeading", magneticHeading);
+
+        if (location == null) {
+            response.put("trueHeading", null);
+        } else {
+            GeomagneticField geo = new GeomagneticField(
+                    (float) location.getLatitude(),
+                    (float) location.getLongitude(),
+                    (float) location.getAltitude(),
+                    System.currentTimeMillis()
+            );
+            response.put("trueHeading", magneticHeading + geo.getDeclination());
+        }
         response.put("x", magnetometerReading[0]);
         response.put("y", magnetometerReading[1]);
         response.put("z", magnetometerReading[2]);
@@ -143,6 +166,13 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
     @Override
     public void onCancel(Object arguments) {
         sink = null;
+    }
+
+    @Override
+    public void onSuccess(Location location) {
+        /// Guard against null location
+        if (location == null) return;
+        this.location = location;
     }
 }
 

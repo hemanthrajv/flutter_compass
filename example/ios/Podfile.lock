@@ -2,7 +2,7 @@ PODS:
   - compass (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - permission_handler (3.3.0):
+  - "permission_handler (5.0.1+1)":
     - Flutter
 
 DEPENDENCIES:
@@ -21,7 +21,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   compass: e99c26598694570c5dfaca0080b0871659717e87
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  permission_handler: 67637977b227d62d46bfbf524f335f8568de5a73
+  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
