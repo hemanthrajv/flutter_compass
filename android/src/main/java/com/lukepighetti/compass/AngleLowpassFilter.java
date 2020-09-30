@@ -8,7 +8,11 @@ import java.util.ArrayDeque;
 // angle toggles (ie NW => NE, NE => NW). It then averages the vector components
 // over LENGTH iterations, and then uses trig to pull it back into a radian value.
 public class AngleLowpassFilter {
-    private final int LENGTH = 10;
+    AngleLowpassFilter(int length) {
+        this.length = length;
+    }
+
+    private int length;
     private float sumSin, sumCos;
     private ArrayDeque<Float> queue = new ArrayDeque<Float>();
 
@@ -18,7 +22,7 @@ public class AngleLowpassFilter {
 
         queue.add(radians);
 
-        if (queue.size() > LENGTH) {
+        if (queue.size() > length) {
             float old = queue.poll();
             sumSin -= Math.sin(old);
             sumCos -= Math.cos(old);

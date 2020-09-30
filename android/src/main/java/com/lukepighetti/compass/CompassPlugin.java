@@ -41,7 +41,7 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
     private final float[] rotationMatrix = new float[9];
     private final float[] orientationAngles = new float[3];
 
-    private final AngleLowpassFilter azimuthLowpass = new AngleLowpassFilter();
+    private final AngleLowpassFilter azimuthLowpass = new AngleLowpassFilter(200);
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -66,12 +66,12 @@ public class CompassPlugin implements FlutterPlugin, MethodCallHandler, SensorEv
 
         if (accelerometer != null) {
             sensorManager.registerListener(this, accelerometer,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+                    SensorManager.SENSOR_DELAY_FASTEST, SensorManager.SENSOR_DELAY_UI);
         }
 
         if (magneticField != null) {
             sensorManager.registerListener(this, magneticField,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+                    SensorManager.SENSOR_DELAY_FASTEST, SensorManager.SENSOR_DELAY_UI);
         }
 
     }
