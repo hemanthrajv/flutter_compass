@@ -58,7 +58,7 @@ public final class FlutterCompassPlugin implements StreamHandler {
 
             public void onSensorChanged(SensorEvent event) {
                 SensorManager.getRotationMatrixFromVector(rMat, event.values);
-                newAzimuth = ((Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) + (double) 360) % (double) 360 - Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[2]) + (double) 360) % (double) 360;
+                newAzimuth = (Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) + (double) 360) % (double) 360;
                 if (currentAzimuth == null || Math.abs(currentAzimuth - newAzimuth) >= filter) {
                     currentAzimuth = newAzimuth;
                     events.success(newAzimuth);
