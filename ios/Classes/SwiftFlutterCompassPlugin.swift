@@ -37,7 +37,7 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
         if(newHeading.headingAccuracy>0){
             let heading:CLLocationDirection!;
             heading = newHeading.magneticHeading;
-            eventSink?(heading);
+            eventSink?([heading, heading, newHeading.headingAccuracy]);
         }
     }
 }
