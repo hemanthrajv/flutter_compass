@@ -65,7 +65,7 @@ public final class FlutterCompassPlugin implements StreamHandler {
                     double[] v = new double[3];
                     v[0] = newAzimuth;
                     v[1] = azimuthForCameraMode;
-                    v[2] = null;
+                    v[2] = -1;
                     events.success(v);
                 }
             }

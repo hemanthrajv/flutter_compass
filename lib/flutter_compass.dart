@@ -10,7 +10,7 @@ class CompassEvent {
   CompassEvent.fromList(List<double> data)
     : heading = data[0],
       headingForCameraMode = data[1],
-      accuracy = data[2];
+      accuracy = data[2] == -1 ? null : data[2];
 }
 
 /// [FlutterCompass] is a singleton class that provides assess to compass events
