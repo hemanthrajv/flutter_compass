@@ -1,3 +1,9 @@
+## 0.5.0
+
+**Breaking Change:** The `events` stream now gives you `CompassEvent` that consists of `heading`, `headingForCamera` and `accuracy`.
+
+Android: Remove roll from heading calculations 
+
 ## 0.4.3
 
 Use geomagnetic rotation sensor as fallback on Android

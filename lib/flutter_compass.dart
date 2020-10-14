@@ -7,10 +7,16 @@ class CompassEvent {
   final double heading;
   final double headingForCameraMode;
   final double accuracy;
+
   CompassEvent.fromList(List<double> data)
-    : heading = data[0],
-      headingForCameraMode = data[1],
-      accuracy = data[2] == -1 ? null : data[2];
+      : heading = data[0],
+        headingForCameraMode = data[1],
+        accuracy = data[2] == -1 ? null : data[2];
+
+  @override
+  String toString() {
+    return 'heading: $heading\nheadingForCameraMode: $headingForCameraMode\naccuracy: $accuracy';
+  }
 }
 
 /// [FlutterCompass] is a singleton class that provides assess to compass events
