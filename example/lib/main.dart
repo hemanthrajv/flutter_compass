@@ -17,7 +17,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _hasPermissions = false;
-  double _lastRead = 0;
+  CompassEvent _lastRead;
   DateTime _lastReadAt;
 
   @override
@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
           RaisedButton(
             child: Text('Read Value'),
             onPressed: () async {
-              final double tmp = await FlutterCompass.events.first;
+              final CompassEvent tmp = await FlutterCompass.events.first;
               setState(() {
                 _lastRead = tmp;
                 _lastReadAt = DateTime.now();
@@ -67,18 +67,21 @@ class _MyAppState extends State<MyApp> {
             },
           ),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Text(
-                  '$_lastRead',
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                Text(
-                  '$_lastReadAt',
-                  style: Theme.of(context).textTheme.caption,
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    '$_lastRead',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                  Text(
+                    '$_lastReadAt',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -87,7 +90,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildCompass() {
-    return StreamBuilder<double>(
+    return StreamBuilder<CompassEvent>(
       stream: FlutterCompass.events,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -100,7 +103,7 @@ class _MyAppState extends State<MyApp> {
           );
         }
 
-        double direction = snapshot.data;
+        double direction = snapshot.data.heading;
 
         // if direction is null, then device does not support this sensor
         // show error message
@@ -109,11 +112,20 @@ class _MyAppState extends State<MyApp> {
             child: Text("Device does not have sensors !"),
           );
 
-        return Container(
-          alignment: Alignment.center,
-          child: Transform.rotate(
-            angle: ((direction ?? 0) * (math.pi / 180) * -1),
-            child: Image.asset('assets/compass.jpg'),
+        return Material(
+          shape: CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          elevation: 4.0,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+            ),
+            child: Transform.rotate(
+              angle: ((direction ?? 0) * (math.pi / 180) * -1),
+              child: Image.asset('assets/compass.jpg'),
+            ),
           ),
         );
       },
