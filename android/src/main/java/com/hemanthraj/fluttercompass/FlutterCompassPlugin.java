@@ -19,6 +19,7 @@ public final class FlutterCompassPlugin implements StreamHandler {
     
     private double newAzimuth;
     private double filter;
+    private int lastAccuracy;
     private SensorEventListener sensorEventListener;
 
     private final SensorManager sensorManager;
@@ -37,9 +38,6 @@ public final class FlutterCompassPlugin implements StreamHandler {
         if(sensor != null) {
             sensorEventListener = createSensorEventListener(events);
             sensorManager.registerListener(sensorEventListener, this.sensor, SensorManager.SENSOR_DELAY_UI);
-            if (currentAzimuth != null) {
-                events.success(currentAzimuth);
-            }
         } else {
             // Send null to Flutter side
             events.success(null);
@@ -54,14 +52,21 @@ public final class FlutterCompassPlugin implements StreamHandler {
     private SensorEventListener createSensorEventListener(final EventSink events) {
         return new SensorEventListener() {
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                lastAccuracy = accuracy;
             }
 
             public void onSensorChanged(SensorEvent event) {
                 SensorManager.getRotationMatrixFromVector(rMat, event.values);
-                newAzimuth = ((Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) + (double) 360) % (double) 360 - Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[2]) + (double) 360) % (double) 360;
+                newAzimuth = (Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) + (double) 360) % (double) 360;
                 if (currentAzimuth == null || Math.abs(currentAzimuth - newAzimuth) >= filter) {
                     currentAzimuth = newAzimuth;
-                    events.success(newAzimuth);
+
+                    double azimuthForCameraMode = (Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) - Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[2]) + (double) 360) % (double) 360;
+                    double[] v = new double[3];
+                    v[0] = newAzimuth;
+                    v[1] = azimuthForCameraMode;
+                    v[2] = -1;
+                    events.success(v);
                 }
             }
         };
@@ -69,6 +74,7 @@ public final class FlutterCompassPlugin implements StreamHandler {
 
     private FlutterCompassPlugin(Context context, int sensorType, int fallbackSensorType) {
         filter = 1.0F;
+        lastAccuracy = 1; // SENSOR_STATUS_ACCURACY_LOW
 
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         orientation = new float[3];
