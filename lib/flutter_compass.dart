@@ -34,20 +34,29 @@ class FlutterCompass {
       const EventChannel('hemanthraj/flutter_compass');
 
   BehaviorSubject<CompassEvent> _compassEvents;
+  static StreamSubscription _sub;
 
   /// Provides a [Stream] of compass events that can be listened to.
   static Stream<CompassEvent> get events {
     if (_instance._compassEvents == null) {
       _instance._compassEvents = BehaviorSubject<CompassEvent>();
-      _instance._compassEvents.addStream(_compassChannel
-          .receiveBroadcastStream()
-          .map((dynamic data) => CompassEvent.fromList(data.cast<double>())));
+      if (_sub == null) {
+        _sub = _compassChannel
+            .receiveBroadcastStream()
+            .map((dynamic data) => CompassEvent.fromList(data.cast<double>()))
+            .listen(
+              (event) => _instance._compassEvents.add(event),
+              onError: _instance._compassEvents.addError,
+            );
+      }
     }
 
     return _instance._compassEvents;
   }
 
   void dispose() {
+    _sub?.cancel();
+    _sub = null;
     _compassEvents?.close();
     _compassEvents = null;
   }
