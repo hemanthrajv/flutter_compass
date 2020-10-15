@@ -67,12 +67,12 @@ class CLHeading implements CompassHeading {
 
   @override
   String toString() => 'CLHeading('
+      'headingAccuracy:${headingAccuracy.toStringAsPrecision(3)},'
+      'magneticHeading:${magneticHeading.toStringAsPrecision(3)}, '
+      'timestamp:$timestamp'
+      'trueHeading:${trueHeading.toStringAsPrecision(3)}, '
       'x:${x.toStringAsPrecision(3)}, '
       'y:${y.toStringAsPrecision(3)}, '
       'z:${z.toStringAsPrecision(3)}, '
-      'headingAccuracy:${headingAccuracy.toStringAsPrecision(3)},'
-      'magneticHeading:${magneticHeading.toStringAsPrecision(3)}, '
-      'trueHeading:${trueHeading.toStringAsPrecision(3)}, '
-      'timestamp:$timestamp'
       ')';
 }

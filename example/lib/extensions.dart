@@ -3,14 +3,17 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 
 extension NumX on num {
-  /// Convert degrees to radians
+  /// Convert degrees to radians, is `compassDegrees.asRadians`
   double get asRadians => this * (2 * math.pi) / 360;
 
-  /// Convert degrees to radians
+  /// Convert degrees to radians, ie `45.degrees`
   double get degrees => this.asRadians;
 
-  /// Convert radians into degrees
-  double get asDegrees => this * 380 / (2 * math.pi);
+  /// Convert radians into degrees, ie `angle.asDegrees`
+  double get asDegrees => this * 360 / (2 * math.pi);
+
+  /// Convert turns into radians, ie `1.turns == 360.degrees`
+  double get turns => this * 2 * math.pi;
 }
 
 extension WidgetX on Widget {
