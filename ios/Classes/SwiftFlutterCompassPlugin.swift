@@ -10,7 +10,7 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
     init(channel: FlutterEventChannel) {
         super.init()
         location.delegate = self
-        location.headingFilter = 1;
+        location.headingFilter = 0.1;
         channel.setStreamHandler(self);
     }
 

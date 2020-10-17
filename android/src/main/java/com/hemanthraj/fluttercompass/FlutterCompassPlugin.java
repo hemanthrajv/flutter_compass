@@ -73,7 +73,7 @@ public final class FlutterCompassPlugin implements StreamHandler {
     }
 
     private FlutterCompassPlugin(Context context, int sensorType, int fallbackSensorType) {
-        filter = 1.0F;
+        filter = 0.1F;
         lastAccuracy = 1; // SENSOR_STATUS_ACCURACY_LOW
 
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
