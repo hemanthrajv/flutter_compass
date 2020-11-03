@@ -4,8 +4,18 @@ import 'package:flutter/services.dart';
 import 'package:rxdart/subjects.dart';
 
 class CompassEvent {
+  // The heading, in degrees, of the device relative to the its Y
+  // axis, or where the top of the device is pointing.
   final double heading;
+
+  // The heading, in degrees, of the device relative to its X axis, or
+  // where the back of the device is pointing.
   final double headingForCameraMode;
+
+  // The deviation error, in degrees, plus or minus from the heading.
+  // NOTE: for iOS this is computed by the platform and is reliable. For
+  // Android several values are hard-coded, and the true error could be more
+  // or less than the value here.
   final double accuracy;
 
   CompassEvent.fromList(List<double> data)
