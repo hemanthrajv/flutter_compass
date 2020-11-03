@@ -29,7 +29,7 @@ Make sure to add keys with appropriate descriptions to the `Info.plist` file.
 Make sure to add permissions to the `app/src/main/AndroidManifest.xml` file.
 
 * `android.permission.INTERNET`
-* `android.permission.ACCESS_COARSE_LOCATIO`
+* `android.permission.ACCESS_COARSE_LOCATION`
 * `android.permission.ACCESS_FINE_LOCATION`
 
 :memo: [Reference example code](https://github.com/hemanthrajv/flutter_compass/blob/89dccd39a32af970322b237e574d2e6fa3454568/example/android/app/src/main/AndroidManifest.xml#L4-L10)

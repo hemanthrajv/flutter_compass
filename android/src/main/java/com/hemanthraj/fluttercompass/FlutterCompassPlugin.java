@@ -61,11 +61,31 @@ public final class FlutterCompassPlugin implements StreamHandler {
                 if (currentAzimuth == null || Math.abs(currentAzimuth - newAzimuth) >= filter) {
                     currentAzimuth = newAzimuth;
 
-                    double azimuthForCameraMode = (Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[0]) - Math.toDegrees((double) SensorManager.getOrientation(rMat, orientation)[2]) + (double) 360) % (double) 360;
+                    // Compute the orientation relative to the Z axis (out the back of the device).
+                    float[] zAxisRmat = new float[9];
+                    SensorManager.remapCoordinateSystem(
+                        rMat,
+                        SensorManager.AXIS_X,
+                        SensorManager.AXIS_Z,
+                        zAxisRmat);
+                    float[] dv = new float[3]; 
+                    SensorManager.getOrientation(zAxisRmat, dv);
+                    double azimuthForCameraMode = (Math.toDegrees((double) dv[0]) + (double) 360) % (double) 360;
+
                     double[] v = new double[3];
                     v[0] = newAzimuth;
                     v[1] = azimuthForCameraMode;
-                    v[2] = -1;
+                    // Include reasonable compass accuracy numbers. These are not representative
+                    // of the real error.
+                    if (lastAccuracy == SensorManager.SENSOR_STATUS_ACCURACY_HIGH) {
+                        v[2] = 15;
+                    } else if (lastAccuracy == SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
+                        v[2] = 30;
+                    } else if (lastAccuracy == SensorManager.SENSOR_STATUS_ACCURACY_LOW) {
+                        v[2] = 45;
+                    } else {
+                        v[2] = -1; // unknown
+                    }
                     events.success(v);
                 }
             }
@@ -73,7 +93,7 @@ public final class FlutterCompassPlugin implements StreamHandler {
     }
 
     private FlutterCompassPlugin(Context context, int sensorType, int fallbackSensorType) {
-        filter = 1.0F;
+        filter = 0.1F;
         lastAccuracy = 1; // SENSOR_STATUS_ACCURACY_LOW
 
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
