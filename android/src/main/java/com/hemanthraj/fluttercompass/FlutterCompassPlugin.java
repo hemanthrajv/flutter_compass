@@ -75,11 +75,16 @@ public final class FlutterCompassPlugin implements StreamHandler {
                     double[] v = new double[3];
                     v[0] = newAzimuth;
                     v[1] = azimuthForCameraMode;
-                    // Include reasonable compass accuracy numbers.
+                    // Include reasonable compass accuracy numbers. These are not representative
+                    // of the real error.
                     if (lastAccuracy == SensorManager.SENSOR_STATUS_ACCURACY_HIGH) {
-                        v[2] = 15; // +/- 15deg
+                        v[2] = 15;
+                    } else if (lastAccuracy == SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
+                        v[2] = 30;
+                    } else if (lastAccuracy == SensorManager.SENSOR_STATUS_ACCURACY_LOW) {
+                        v[2] = 45;
                     } else {
-                        v[2] = 90; // +/- 90 deg
+                        v[2] = -1; // unknown
                     }
                     events.success(v);
                 }
