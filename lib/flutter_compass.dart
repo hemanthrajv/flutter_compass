@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:rxdart/subjects.dart';
 
 class CompassEvent {
-  // The heading, in degrees, of the device relative to the its Y
+  // The heading, in degrees, of the device around its Z
   // axis, or where the top of the device is pointing.
   final double heading;
 
-  // The heading, in degrees, of the device relative to its X axis, or
+  // The heading, in degrees, of the device around its X axis, or
   // where the back of the device is pointing.
   final double headingForCameraMode;
 
