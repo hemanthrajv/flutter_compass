@@ -1,8 +1,15 @@
 ## 0.5.0
 
 **Breaking Change:** The `events` stream now gives you `CompassEvent` that consists of `heading`, `headingForCamera` and `accuracy`.
-
-Android: Remove roll from heading calculations 
+ 
+Android: 
+* Remove roll from heading calculations
+* Uses matrix reorientation to do a better job calculating heading "out the back of the phone"
+iOS: 
+* Use the device motion orientation matrix to compute heading out the back of the device. This is much like what is done on Android, and yields a more
+stable and precise heading.
+Dart:
+* Add documentation to flutter_compass.dart.
 
 ## 0.4.3
 
