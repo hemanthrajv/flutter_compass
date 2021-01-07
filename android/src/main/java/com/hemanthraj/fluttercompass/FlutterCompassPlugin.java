@@ -69,9 +69,10 @@ public final class FlutterCompassPlugin implements StreamHandler {
         if (compassSensor == null) {
             Log.d(TAG, "Rotation vector sensor not supported on device, "
                     + "falling back to accelerometer and magnetic field.");
-            gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         }
+
+        gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
     public static void registerWith(Registrar registrar) {
@@ -85,19 +86,19 @@ public final class FlutterCompassPlugin implements StreamHandler {
         if (isCompassSensorAvailable()) {
             // Does nothing if the sensors already registered.
             sensorManager.registerListener(sensorEventListener, compassSensor, SENSOR_DELAY_MICROS);
-        } else {
-            sensorManager.registerListener(sensorEventListener, gravitySensor, SENSOR_DELAY_MICROS);
-            sensorManager.registerListener(sensorEventListener, magneticFieldSensor, SENSOR_DELAY_MICROS);
         }
+
+        sensorManager.registerListener(sensorEventListener, gravitySensor, SENSOR_DELAY_MICROS);
+        sensorManager.registerListener(sensorEventListener, magneticFieldSensor, SENSOR_DELAY_MICROS);
     }
 
     public void onCancel(Object arguments) {
         if (isCompassSensorAvailable()) {
             sensorManager.unregisterListener(sensorEventListener, compassSensor);
-        } else {
-            sensorManager.unregisterListener(sensorEventListener, gravitySensor);
-            sensorManager.unregisterListener(sensorEventListener, magneticFieldSensor);
         }
+
+        sensorManager.unregisterListener(sensorEventListener, gravitySensor);
+        sensorManager.unregisterListener(sensorEventListener, magneticFieldSensor);
     }
 
     private boolean isCompassSensorAvailable() {
@@ -118,10 +119,10 @@ public final class FlutterCompassPlugin implements StreamHandler {
                 if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
                     rotationVectorValue = getRotationVectorFromSensorEvent(event);
                     updateOrientation();
-                } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER && !isCompassSensorAvailable()) {
                     gravityValues = lowPassFilter(getRotationVectorFromSensorEvent(event), gravityValues);
                     updateOrientation();
-                } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD && !isCompassSensorAvailable()) {
                     magneticValues = lowPassFilter(getRotationVectorFromSensorEvent(event), magneticValues);
                     updateOrientation();
                 }
