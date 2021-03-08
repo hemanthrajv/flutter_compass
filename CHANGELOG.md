@@ -1,3 +1,6 @@
+## 0.6.0
+* Migrate to null safety
+
 ## 0.5.1
 
 Android: 

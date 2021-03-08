@@ -8,7 +8,7 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
   const MyApp({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -17,8 +17,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _hasPermissions = false;
-  CompassEvent _lastRead;
-  DateTime _lastReadAt;
+  CompassEvent? _lastRead;
+  DateTime? _lastReadAt;
 
   @override
   void initState() {
@@ -56,10 +56,10 @@ class _MyAppState extends State<MyApp> {
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: <Widget>[
-          RaisedButton(
+          ElevatedButton(
             child: Text('Read Value'),
             onPressed: () async {
-              final CompassEvent tmp = await FlutterCompass.events.first;
+              final CompassEvent tmp = await FlutterCompass.events!.first;
               setState(() {
                 _lastRead = tmp;
                 _lastReadAt = DateTime.now();
@@ -103,7 +103,7 @@ class _MyAppState extends State<MyApp> {
           );
         }
 
-        double direction = snapshot.data.heading;
+        double? direction = snapshot.data!.heading;
 
         // if direction is null, then device does not support this sensor
         // show error message
@@ -123,7 +123,7 @@ class _MyAppState extends State<MyApp> {
               shape: BoxShape.circle,
             ),
             child: Transform.rotate(
-              angle: ((direction ?? 0) * (math.pi / 180) * -1),
+              angle: (direction * (math.pi / 180) * -1),
               child: Image.asset('assets/compass.jpg'),
             ),
           ),
@@ -138,20 +138,19 @@ class _MyAppState extends State<MyApp> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text('Location Permission Required'),
-          RaisedButton(
+          ElevatedButton(
             child: Text('Request Permissions'),
             onPressed: () {
-              PermissionHandler().requestPermissions(
-                  [PermissionGroup.locationWhenInUse]).then((ignored) {
+              Permission.locationWhenInUse.request().then((ignored) {
                 _fetchPermissionStatus();
               });
             },
           ),
           SizedBox(height: 16),
-          RaisedButton(
+          ElevatedButton(
             child: Text('Open App Settings'),
             onPressed: () {
-              PermissionHandler().openAppSettings().then((opened) {
+              openAppSettings().then((opened) {
                 //
               });
             },
@@ -162,9 +161,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _fetchPermissionStatus() {
-    PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.locationWhenInUse)
-        .then((status) {
+    Permission.locationWhenInUse.status.then((status) {
       if (mounted) {
         setState(() => _hasPermissions = status == PermissionStatus.granted);
       }
