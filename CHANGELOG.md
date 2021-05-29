@@ -1,3 +1,6 @@
+## 0.6.1
+* Flutter Compass no more depends on RxDart
+
 ## 0.6.0
 * Migrate to null safety
 
