@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:rxdart/subjects.dart';
 
 class CompassEvent {
   // The heading, in degrees, of the device around its Z
@@ -43,31 +42,11 @@ class FlutterCompass {
   static const EventChannel _compassChannel =
       const EventChannel('hemanthraj/flutter_compass');
 
-  BehaviorSubject<CompassEvent>? _compassEvents;
-  static StreamSubscription? _sub;
-
   /// Provides a [Stream] of compass events that can be listened to.
   static Stream<CompassEvent>? get events {
-    if (_instance._compassEvents == null) {
-      _instance._compassEvents = BehaviorSubject<CompassEvent>();
-      if (_sub == null) {
-        _sub = _compassChannel
-            .receiveBroadcastStream()
-            .map((dynamic data) => CompassEvent.fromList(data.cast<double>()))
-            .listen(
-              (event) => _instance._compassEvents!.add(event),
-              onError: _instance._compassEvents!.addError,
-            );
-      }
-    }
-
-    return _instance._compassEvents;
+    return _compassChannel
+        .receiveBroadcastStream()
+        .map((dynamic data) => CompassEvent.fromList(data.cast<double>()));
   }
 
-  void dispose() {
-    _sub?.cancel();
-    _sub = null;
-    _compassEvents?.close();
-    _compassEvents = null;
-  }
 }
