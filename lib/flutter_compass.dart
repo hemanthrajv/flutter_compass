@@ -17,10 +17,10 @@ class CompassEvent {
   // or less than the value here.
   final double? accuracy;
 
-  CompassEvent.fromList(List<double> data)
-      : heading = data[0],
-        headingForCameraMode = data[1],
-        accuracy = data[2] == -1 ? null : data[2];
+  CompassEvent.fromList(List<double>? data)
+      : heading = data?[0] ?? null,
+        headingForCameraMode = data?[1] ?? null,
+        accuracy = (data == null) || (data[2] == -1) ? null : data[2];
 
   @override
   String toString() {
@@ -48,5 +48,4 @@ class FlutterCompass {
         .receiveBroadcastStream()
         .map((dynamic data) => CompassEvent.fromList(data.cast<double>()));
   }
-
 }
