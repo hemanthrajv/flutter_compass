@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -257,16 +256,31 @@ public final class FlutterCompassPlugin implements StreamHandler {
                 // Transform rotation matrix into azimuth/pitch/roll
                 SensorManager.getOrientation(adjustedRotationMatrix, orientation);
 
+                double[] v = new double[3];
+                v[0] = Math.toDegrees(orientation[0]);
+                v[2] = getAccuracy();
                 // The x-axis is all we care about here.
-                notifyCompassChangeListeners((float) Math.toDegrees(orientation[0]));
+                notifyCompassChangeListeners(v);
 
                 // Update the compassUpdateNextTimestamp
                 compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
             }
 
-            private void notifyCompassChangeListeners(float heading) {
+            private void notifyCompassChangeListeners(double[] heading) {
                 events.success(heading);
-                lastHeading = heading;
+                lastHeading = (float) heading[0];
+            }
+
+            private double getAccuracy() {
+                if (lastAccuracySensorStatus == SensorManager.SENSOR_STATUS_ACCURACY_HIGH) {
+                    return 15;
+                } else if (lastAccuracySensorStatus == SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
+                    return 30;
+                } else if (lastAccuracySensorStatus == SensorManager.SENSOR_STATUS_ACCURACY_LOW) {
+                    return 45;
+                } else {
+                    return -1; // unknown
+                }
             }
 
             /**
