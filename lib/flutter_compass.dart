@@ -17,10 +17,10 @@ class CompassEvent {
   // or less than the value here.
   final double? accuracy;
 
-  CompassEvent.fromList(List<double> data)
-      : heading = data[0],
-        headingForCameraMode = data[1],
-        accuracy = data[2] == -1 ? null : data[2];
+  CompassEvent.fromList(List<double>? data)
+      : heading = data?[0] ?? null,
+        headingForCameraMode = data?[1] ?? null,
+        accuracy = (data == null) || (data[2] == -1) ? null : data[2];
 
   @override
   String toString() {
@@ -41,15 +41,11 @@ class FlutterCompass {
 
   static const EventChannel _compassChannel =
       const EventChannel('hemanthraj/flutter_compass');
-  static Stream<CompassEvent>? _stream;
 
   /// Provides a [Stream] of compass events that can be listened to.
   static Stream<CompassEvent>? get events {
-    if (_stream == null) {
-      _stream = _compassChannel
-          .receiveBroadcastStream()
-          .map((dynamic data) => CompassEvent.fromList(data.cast<double>()));
-    }
-    return _stream;
+    return _compassChannel
+        .receiveBroadcastStream()
+        .map((dynamic data) => CompassEvent.fromList(data?.cast<double>()));
   }
 }
