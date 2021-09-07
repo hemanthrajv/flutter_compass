@@ -80,3 +80,5 @@ Runner.ipa
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
 fastlane/README.md
+.project
+*.bak
