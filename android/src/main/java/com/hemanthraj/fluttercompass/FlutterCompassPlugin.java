@@ -11,10 +11,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.display.DisplayManager;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Surface;
-import android.view.WindowManager;
+import android.view.Display;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,6 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler {
     private static final String TAG = "FlutterCompass";
@@ -43,7 +43,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
 
     private SensorEventListener sensorEventListener;
 
-    private WindowManager windowManager;
+    private Display display;
     private SensorManager sensorManager;
 
     @Nullable
@@ -68,7 +68,8 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
     }
 
     private FlutterCompassPlugin(Context context) {
-        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        display = ((DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE))
+                .getDisplay(Display.DEFAULT_DISPLAY);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         if (compassSensor == null) {
@@ -78,11 +79,6 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
 
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-    }
-
-    public static void registerWith(Registrar registrar) {
-        EventChannel channel = new EventChannel(registrar.messenger(), "hemanthraj/flutter_compass");
-        channel.setStreamHandler(new FlutterCompassPlugin(registrar.context()));
     }
 
     // New Plugin APIs
@@ -171,7 +167,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
 
                 // Assume the device screen was parallel to the ground,
                 // and adjust the rotation matrix for the device orientation.
-                switch (windowManager.getDefaultDisplay().getRotation()) {
+                switch (display.getRotation()) {
                     case Surface.ROTATION_90:
                         worldAxisForDeviceAxisX = SensorManager.AXIS_Y;
                         worldAxisForDeviceAxisY = SensorManager.AXIS_MINUS_X;
@@ -202,7 +198,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
                 if (orientation[1] < -Math.PI / 4) {
                     // The pitch is less than -45 degrees.
                     // Remap the axes as if the device screen was the instrument panel.
-                    switch (windowManager.getDefaultDisplay().getRotation()) {
+                    switch (display.getRotation()) {
                         case Surface.ROTATION_90:
                             worldAxisForDeviceAxisX = SensorManager.AXIS_Z;
                             worldAxisForDeviceAxisY = SensorManager.AXIS_MINUS_X;
@@ -224,7 +220,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
                 } else if (orientation[1] > Math.PI / 4) {
                     // The pitch is larger than 45 degrees.
                     // Remap the axes as if the device screen was upside down and facing back.
-                    switch (windowManager.getDefaultDisplay().getRotation()) {
+                    switch (display.getRotation()) {
                         case Surface.ROTATION_90:
                             worldAxisForDeviceAxisX = SensorManager.AXIS_MINUS_Z;
                             worldAxisForDeviceAxisY = SensorManager.AXIS_MINUS_X;
@@ -246,7 +242,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
                 } else if (Math.abs(orientation[2]) > Math.PI / 2) {
                     // The roll is less than -90 degrees, or is larger than 90 degrees.
                     // Remap the axes as if the device screen was face down.
-                    switch (windowManager.getDefaultDisplay().getRotation()) {
+                    switch (display.getRotation()) {
                         case Surface.ROTATION_90:
                             worldAxisForDeviceAxisX = SensorManager.AXIS_MINUS_Y;
                             worldAxisForDeviceAxisY = SensorManager.AXIS_MINUS_X;
