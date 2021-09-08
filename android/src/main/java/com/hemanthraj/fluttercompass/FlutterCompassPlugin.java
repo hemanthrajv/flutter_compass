@@ -19,19 +19,22 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public final class FlutterCompassPlugin implements StreamHandler {
+public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler {
     private static final String TAG = "FlutterCompass";
-    // The rate sensor events will be delivered at. As the Android documentation states, this is only
-    // a hint to the system and the events might actually be received faster or slower then this
-    // specified rate. Since the minimum Android API levels about 9, we are able to set this value
-    // ourselves rather than using one of the provided constants which deliver updates too quickly for
-    // our use case. The default is set to 100ms
+    // The rate sensor events will be delivered at. As the Android documentation
+    // states, this is only a hint to the system and the events might actually be
+    // received faster or slower than this specified rate. Since the minimum
+    // Android API levels about 9, we are able to set this value ourselves rather
+    // than using one of the provided constants which deliver updates too quickly
+    // for our use case. The default is set to 100ms
     private static final int SENSOR_DELAY_MICROS = 100 * 1000;
+
     // Filtering coefficient 0 < ALPHA < 1
     private static final float ALPHA = 0.45f;
 
@@ -40,8 +43,8 @@ public final class FlutterCompassPlugin implements StreamHandler {
 
     private SensorEventListener sensorEventListener;
 
-    private final WindowManager windowManager;
-    private final SensorManager sensorManager;
+    private WindowManager windowManager;
+    private SensorManager sensorManager;
 
     @Nullable
     private Sensor compassSensor;
@@ -60,6 +63,9 @@ public final class FlutterCompassPlugin implements StreamHandler {
     private float[] gravityValues = new float[3];
     private float[] magneticValues = new float[3];
 
+    public FlutterCompassPlugin() {
+        // no-op
+    }
 
     private FlutterCompassPlugin(Context context) {
         windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -77,6 +83,18 @@ public final class FlutterCompassPlugin implements StreamHandler {
     public static void registerWith(Registrar registrar) {
         EventChannel channel = new EventChannel(registrar.messenger(), "hemanthraj/flutter_compass");
         channel.setStreamHandler(new FlutterCompassPlugin(registrar.context()));
+    }
+
+    // New Plugin APIs
+
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        EventChannel channel = new EventChannel(binding.getBinaryMessenger(), "hemanthraj/flutter_compass");
+        channel.setStreamHandler(new FlutterCompassPlugin(binding.getApplicationContext()));
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     }
 
     public void onListen(Object arguments, EventSink events) {
@@ -103,7 +121,6 @@ public final class FlutterCompassPlugin implements StreamHandler {
     private boolean isCompassSensorAvailable() {
         return compassSensor != null;
     }
-
 
     SensorEventListener createSensorEventListener(final EventSink events) {
         return new SensorEventListener() {
@@ -175,8 +192,8 @@ public final class FlutterCompassPlugin implements StreamHandler {
                 }
 
                 float[] adjustedRotationMatrix = new float[9];
-                SensorManager.remapCoordinateSystem(rotationMatrix, worldAxisForDeviceAxisX,
-                        worldAxisForDeviceAxisY, adjustedRotationMatrix);
+                SensorManager.remapCoordinateSystem(rotationMatrix, worldAxisForDeviceAxisX, worldAxisForDeviceAxisY,
+                        adjustedRotationMatrix);
 
                 // Transform rotation matrix into azimuth/pitch/roll
                 float[] orientation = new float[3];
@@ -250,8 +267,8 @@ public final class FlutterCompassPlugin implements StreamHandler {
                     }
                 }
 
-                SensorManager.remapCoordinateSystem(rotationMatrix, worldAxisForDeviceAxisX,
-                        worldAxisForDeviceAxisY, adjustedRotationMatrix);
+                SensorManager.remapCoordinateSystem(rotationMatrix, worldAxisForDeviceAxisX, worldAxisForDeviceAxisY,
+                        adjustedRotationMatrix);
 
                 // Transform rotation matrix into azimuth/pitch/roll
                 SensorManager.getOrientation(adjustedRotationMatrix, orientation);
@@ -324,4 +341,3 @@ public final class FlutterCompassPlugin implements StreamHandler {
         };
     }
 }
-
