@@ -1,3 +1,10 @@
+## 0.7.0
+* Updates Android Embedding
+* Resolves deprecations warnings
+* New Android Implementation supporting Sensor.TYPE_ROTATION_VECTOR and Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR.
+* Fixes multiple listeners on stream
+* Fixes for null safety
+
 ## 0.6.1
 * Flutter Compass no more depends on RxDart
 
