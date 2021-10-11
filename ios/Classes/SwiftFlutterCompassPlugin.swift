@@ -42,7 +42,7 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
 
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         if (newHeading.headingAccuracy>0){
-            var headingForCameraMode = newHeading.magneticHeading;
+            var headingForCameraMode = newHeading.trueHeading;
             // If device orientation data is available, use it to calculate the heading out the the
             // back of the device (rather than out the top of the device).
             if let data = self.motion.deviceMotion?.attitude {
@@ -69,7 +69,7 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
                 let yaw = atan2(T[0, 1], T[1, 1]) + Double.pi / 2;
                 headingForCameraMode = (yaw + Double.pi * 2).truncatingRemainder(dividingBy: Double.pi * 2) * 180.0 / Double.pi;
             }
-            eventSink?([newHeading.magneticHeading, headingForCameraMode, newHeading.headingAccuracy]);
+            eventSink?([newHeading.trueHeading, headingForCameraMode, newHeading.headingAccuracy]);
         }
     }
 }
