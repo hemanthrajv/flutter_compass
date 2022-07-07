@@ -44,10 +44,10 @@ class FlutterCompass {
   static Stream<CompassEvent>? _stream;
 
   /// Provides a [Stream] of compass events that can be listened to.
-  static Stream<CompassEvent>? get events {
+  static Stream<CompassEvent> get events {
     _stream ??= _compassChannel
         .receiveBroadcastStream()
         .map((dynamic data) => CompassEvent.fromList(data?.cast<double>()));
-    return _stream;
+    return _stream!;
   }
 }
