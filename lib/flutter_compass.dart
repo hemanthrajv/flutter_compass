@@ -44,7 +44,7 @@ class FlutterCompass {
 
   /// Provides a [Stream] of compass events that can be listened to.
   /// Controls the compass update rate in milliseconds
-  static Future<Stream<CompassEvent>?> flutterCompass ({int compassUpdateRate = 32}) async{
+  static Stream<CompassEvent>? flutterCompass ({int compassUpdateRate = 32}){
     _stream ??= _compassChannel
         .receiveBroadcastStream([compassUpdateRate])
         .map((dynamic data) => CompassEvent.fromList(data?.cast<double>()));
