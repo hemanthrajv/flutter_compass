@@ -14,12 +14,18 @@ import android.view.Display;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.plugin.common.EventChannel.EventSink;
-import io.flutter.plugin.common.EventChannel.StreamHandler;
+import java.util.ArrayList;
 
-public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler {
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
+
+
+public final class FlutterCompassPlugin implements FlutterPlugin, EventChannel.StreamHandler {
     private static final String TAG = "FlutterCompass";
     // The rate sensor events will be delivered at. As the Android documentation
     // states, this is only a hint to the system and the events might actually be
@@ -33,7 +39,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
     private static final float ALPHA = 0.45f;
 
     // Controls the compass update rate in milliseconds
-    private static final int COMPASS_UPDATE_RATE_MS = 32;
+    private static int COMPASS_UPDATE_RATE_MS = 32;
 
     private SensorEventListener sensorEventListener;
 
@@ -61,6 +67,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
         // no-op
     }
 
+
     private FlutterCompassPlugin(Context context) {
         display = ((DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE))
                 .getDisplay(Display.DEFAULT_DISPLAY);
@@ -87,7 +94,12 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     }
 
-    public void onListen(Object arguments, EventSink events) {
+    public void onListen(Object arguments, EventChannel.EventSink events) {
+        ArrayList<Integer> args = (ArrayList<Integer>) arguments;
+        if(!args.isEmpty()){
+            COMPASS_UPDATE_RATE_MS = args.get(0);
+        }
+
         sensorEventListener = createSensorEventListener(events);
 
         if (isCompassSensorAvailable()) {
@@ -112,7 +124,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
         return compassSensor != null;
     }
 
-    SensorEventListener createSensorEventListener(final EventSink events) {
+    SensorEventListener createSensorEventListener(final EventChannel.EventSink events) {
         return new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -330,4 +342,6 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
             }
         };
     }
+
+
 }
