@@ -20,12 +20,15 @@ class _MyAppState extends State<MyApp> {
   CompassEvent? _lastRead;
   DateTime? _lastReadAt;
 
+
   @override
   void initState() {
     super.initState();
 
     _fetchPermissionStatus();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +62,7 @@ class _MyAppState extends State<MyApp> {
           ElevatedButton(
             child: Text('Read Value'),
             onPressed: () async {
-              final CompassEvent tmp = await FlutterCompass.events!.first;
+              final CompassEvent tmp = await FlutterCompass.flutterCompass()!.first;
               setState(() {
                 _lastRead = tmp;
                 _lastReadAt = DateTime.now();
@@ -89,9 +92,11 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+
+
   Widget _buildCompass() {
     return StreamBuilder<CompassEvent>(
-      stream: FlutterCompass.events,
+      stream: FlutterCompass.flutterCompass(compassUpdateRate: 20),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error reading heading: ${snapshot.error}');
