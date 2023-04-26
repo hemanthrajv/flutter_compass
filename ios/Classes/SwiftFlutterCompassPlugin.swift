@@ -42,7 +42,8 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
 
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         if (newHeading.headingAccuracy>0){
-            var headingForCameraMode = newHeading.trueHeading;
+            var trueHeading = newHeading.trueHeading;
+            var headingForCameraMode = trueHeading;
             // If device orientation data is available, use it to calculate the heading out the the
             // back of the device (rather than out the top of the device).
             if let data = self.motion.deviceMotion?.attitude {
@@ -69,7 +70,20 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
                 let yaw = atan2(T[0, 1], T[1, 1]) + Double.pi / 2;
                 headingForCameraMode = (yaw + Double.pi * 2).truncatingRemainder(dividingBy: Double.pi * 2) * 180.0 / Double.pi;
             }
-            eventSink?([newHeading.trueHeading, headingForCameraMode, newHeading.headingAccuracy]);
+            var headingForUI = trueHeading;
+            switch UIApplication.shared.statusBarOrientation {
+                case .portrait:
+                    headingForUI = trueHeading
+                case .portraitUpsideDown:
+                    headingForUI = trueHeading + 180
+                case .landscapeRight:
+                    headingForUI = trueHeading + 90
+                case .landscapeLeft:
+                    headingForUI = trueHeading - 90
+                default:
+                    headingForUI = trueHeading
+            }
+            eventSink?([headingForUI, headingForCameraMode, newHeading.headingAccuracy]);
         }
     }
 }
