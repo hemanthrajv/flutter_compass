@@ -38,6 +38,7 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
     private SensorEventListener sensorEventListener;
 
     private Display display;
+    @Nullable
     private SensorManager sensorManager;
 
     @Nullable
@@ -57,11 +58,14 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
     private float[] gravityValues = new float[3];
     private float[] magneticValues = new float[3];
 
+    @Nullable
+    private EventChannel channel;
+
     public FlutterCompassPlugin() {
         // no-op
     }
 
-    private FlutterCompassPlugin(Context context) {
+    private void getSensors(Context context) {
         display = ((DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE))
                 .getDisplay(Display.DEFAULT_DISPLAY);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -75,21 +79,41 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
+    private void cleanSensors() {
+        sensorManager = null;
+        display = null;
+        compassSensor = null;
+        gravitySensor = null;
+        magneticFieldSensor = null;
+    }
+
     // New Plugin APIs
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-        EventChannel channel = new EventChannel(binding.getBinaryMessenger(), "hemanthraj/flutter_compass");
-        channel.setStreamHandler(new FlutterCompassPlugin(binding.getApplicationContext()));
+        channel = new EventChannel(binding.getBinaryMessenger(), "hemanthraj/flutter_compass");
+        getSensors(binding.getApplicationContext());
+        channel.setStreamHandler(this);
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        unregisterListener();
+        cleanSensors();
+        if (channel != null) channel.setStreamHandler(null);
     }
 
     public void onListen(Object arguments, EventSink events) {
         sensorEventListener = createSensorEventListener(events);
+        registerListener();
+    }
 
+    public void onCancel(Object arguments) {
+        unregisterListener();
+    }
+
+    private void registerListener() {
+        if (sensorManager == null) return;
         if (isCompassSensorAvailable()) {
             // Does nothing if the sensors already registered.
             sensorManager.registerListener(sensorEventListener, compassSensor, SENSOR_DELAY_MICROS);
@@ -99,7 +123,8 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
         sensorManager.registerListener(sensorEventListener, magneticFieldSensor, SENSOR_DELAY_MICROS);
     }
 
-    public void onCancel(Object arguments) {
+    private void unregisterListener() {
+        if (sensorManager == null) return;
         if (isCompassSensorAvailable()) {
             sensorManager.unregisterListener(sensorEventListener, compassSensor);
         }
