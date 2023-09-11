@@ -1,3 +1,8 @@
+## 0.8.0
+* Add guard on web (Web always returns an empty stream)
+* Heading accounts for orientation on iOS
+* Unregister listeners when detaching engine on Android
+
 ## 0.7.0
 * Updates Android Embedding
 * Resolves deprecations warnings

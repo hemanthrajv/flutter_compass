@@ -74,11 +74,11 @@ class _MyAppState extends State<MyApp> {
                 children: <Widget>[
                   Text(
                     '$_lastRead',
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                   Text(
                     '$_lastReadAt',
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),
