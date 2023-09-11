@@ -15,11 +15,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
 
-public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler {
+public final class FlutterCompassPlugin implements FlutterPlugin, ActivityAware, StreamHandler {
     private static final String TAG = "FlutterCompass";
     // The rate sensor events will be delivered at. As the Android documentation
     // states, this is only a hint to the system and the events might actually be
@@ -34,6 +36,8 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
 
     // Controls the compass update rate in milliseconds
     private static final int COMPASS_UPDATE_RATE_MS = 32;
+
+    private EventChannel sensorEventChannel;
 
     private SensorEventListener sensorEventListener;
 
@@ -58,58 +62,98 @@ public final class FlutterCompassPlugin implements FlutterPlugin, StreamHandler 
     private float[] magneticValues = new float[3];
 
     public FlutterCompassPlugin() {
-        // no-op
     }
 
-    private FlutterCompassPlugin(Context context) {
-        display = ((DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE))
-                .getDisplay(Display.DEFAULT_DISPLAY);
-        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+    // New Plugin APIs
+
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        Log.d(TAG, "Attaching compass to activity");
+        display = ((DisplayManager)binding.getActivity().getApplicationContext().getSystemService(Context.DISPLAY_SERVICE)).getDisplay(Display.DEFAULT_DISPLAY);
+        sensorManager = (SensorManager)binding.getActivity().getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         if (compassSensor == null) {
-            Log.d(TAG, "Rotation vector sensor not supported on device, "
-                    + "falling back to accelerometer and magnetic field.");
+            Log.d(TAG, "Rotation vector sensor not supported on device, falling back to accelerometer and magnetic field.");
         }
 
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
-    // New Plugin APIs
-
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-        EventChannel channel = new EventChannel(binding.getBinaryMessenger(), "hemanthraj/flutter_compass");
-        channel.setStreamHandler(new FlutterCompassPlugin(binding.getApplicationContext()));
+        sensorEventChannel = new EventChannel(binding.getBinaryMessenger(), "hemanthraj/flutter_compass");
+        sensorEventChannel.setStreamHandler(this);
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        if (sensorEventChannel != null) {
+            sensorEventChannel.setStreamHandler(null);
+            sensorEventChannel = null;
+        }
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        Log.d(TAG, "Detaching compass from activity");
+        shutdownListeners();
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
     }
 
     public void onListen(Object arguments, EventSink events) {
-        sensorEventListener = createSensorEventListener(events);
+        Log.d(TAG, "onListen");
+        shutdownListeners();
+        startListeners(events);
+    }
+
+    public void onCancel(Object arguments) {
+        Log.d(TAG, "onCancel");
+        shutdownListeners();
+    }
+
+    private boolean isCompassSensorAvailable() {
+        return compassSensor != null;
+    }
+
+    private void shutdownListeners() {
+        if (sensorManager != null) {
+            if (isCompassSensorAvailable() && (sensorEventListener != null)) {
+                sensorManager.unregisterListener(sensorEventListener, compassSensor);
+            }
+
+            if ((gravitySensor != null) && (sensorEventListener != null)) {
+                sensorManager.unregisterListener(sensorEventListener, gravitySensor);
+            }
+            if ((magneticFieldSensor != null) && (sensorEventListener != null)) {
+                sensorManager.unregisterListener(sensorEventListener, magneticFieldSensor);
+            }
+        }
+
+        sensorEventListener = null;
+    }
+
+    private void startListeners(final EventSink events) {
+        if (sensorEventListener == null) {
+            sensorEventListener = createSensorEventListener(events);
+        }
 
         if (isCompassSensorAvailable()) {
             // Does nothing if the sensors already registered.
             sensorManager.registerListener(sensorEventListener, compassSensor, SENSOR_DELAY_MICROS);
         }
 
+        // Does nothing if the sensors already registered.
         sensorManager.registerListener(sensorEventListener, gravitySensor, SENSOR_DELAY_MICROS);
+        // Does nothing if the sensors already registered.
         sensorManager.registerListener(sensorEventListener, magneticFieldSensor, SENSOR_DELAY_MICROS);
-    }
-
-    public void onCancel(Object arguments) {
-        if (isCompassSensorAvailable()) {
-            sensorManager.unregisterListener(sensorEventListener, compassSensor);
-        }
-
-        sensorManager.unregisterListener(sensorEventListener, gravitySensor);
-        sensorManager.unregisterListener(sensorEventListener, magneticFieldSensor);
-    }
-
-    private boolean isCompassSensorAvailable() {
-        return compassSensor != null;
     }
 
     SensorEventListener createSensorEventListener(final EventSink events) {
