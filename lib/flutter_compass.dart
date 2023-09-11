@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class CompassEvent {
@@ -45,6 +46,9 @@ class FlutterCompass {
 
   /// Provides a [Stream] of compass events that can be listened to.
   static Stream<CompassEvent>? get events {
+    if (kIsWeb) {
+      return Stream.empty();
+    }
     _stream ??= _compassChannel
         .receiveBroadcastStream()
         .map((dynamic data) => CompassEvent.fromList(data?.cast<double>()));
