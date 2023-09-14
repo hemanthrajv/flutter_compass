@@ -16,6 +16,10 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     compileSdkVersion 30
+    
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.hemanthraj.fluttercompassexample'
+    }
 
     lintOptions {
         disable 'InvalidPackage'
