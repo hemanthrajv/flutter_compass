@@ -1,6 +1,6 @@
 name: flutter_compass_v2
 description: A Flutter compass. The heading varies from 0-360, 0 being north.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/medyas/flutter_compass_v2
 
 dependencies:
