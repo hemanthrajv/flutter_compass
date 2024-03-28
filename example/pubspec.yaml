@@ -9,9 +9,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  permission_handler: ^11.3.0
+  permission_handler: ^11.3.1
 
-  flutter_compass:
+  flutter_compass_v2:
     path: ../
 
 dev_dependencies:
