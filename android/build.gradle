@@ -4,7 +4,6 @@ version '1.0-SNAPSHOT'
 buildscript {
     repositories {
         google()
-        jcenter()
     }
 
     dependencies {
@@ -15,7 +14,6 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
     }
 }
 
