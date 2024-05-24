@@ -1,6 +1,6 @@
-# flutter_compass
+# flutter_compass_v2
 
-[![pub package](https://img.shields.io/pub/v/flutter_compass.svg)](https://pub.dartlang.org/packages/flutter_compass)
+[![pub package](https://img.shields.io/pub/v/flutter_compass.svg)](https://pub.dartlang.org/packages/flutter_compass_v2)
 
 A Flutter compass. The heading varies from 0-360, 0 being north.
 
@@ -14,7 +14,7 @@ To use this plugin, add `flutter_compass` as a [dependency in your pubspec.yaml 
 
 ```yaml
 dependencies:
-  flutter_compass: '^0.7.0'
+  flutter_compass_v2: '^1.0.0'
 ```
 
 ### iOS

@@ -2,7 +2,7 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
 #
 Pod::Spec.new do |s|
-  s.name             = 'flutter_compass'
+  s.name             = 'flutter_compass_v2'
   s.version          = '0.0.1'
   s.summary          = 'A Flutter compass. The heading varies from 0-360, 0 being north.'
   s.description      = <<-DESC

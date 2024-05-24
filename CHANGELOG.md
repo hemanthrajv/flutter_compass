@@ -1,3 +1,12 @@
+## 1.0.3
+* Fix ios pod issue
+
+## 1.0.1
+* Fix ios pod issue
+
+## 1.0.0
+* Update the Android implementation
+
 ## 0.8.0
 * Add guard on web (Web always returns an empty stream)
 * Heading accounts for orientation on iOS
