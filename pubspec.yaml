@@ -1,6 +1,6 @@
 name: flutter_compass
 description: A Flutter compass. The heading varies from 0-360, 0 being north.
-version: 0.8.0
+version: 0.8.1
 homepage: https://github.com/hemanthrajv/flutter_compass
 
 dependencies:
@@ -8,8 +8,8 @@ dependencies:
     sdk: flutter
 
 environment:
-  sdk: '>=2.12.0 <4.0.0'
-  flutter: '>=1.10.0'
+  sdk: ">=2.12.0 <4.0.0"
+  flutter: ">=1.10.0"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

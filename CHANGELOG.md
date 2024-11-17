@@ -1,3 +1,7 @@
+## 0.8.1
+* Bump the compileSdkVersion to 34 to support Android 14
+* Support the AGP >= 8
+
 ## 0.8.0
 * Add guard on web (Web always returns an empty stream)
 * Heading accounts for orientation on iOS
