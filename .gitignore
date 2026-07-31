@@ -25,6 +25,10 @@ fastlane/report.xml
 # Visual Studio Code related
 .vscode/
 
+# Swift Package Manager related
+.build/
+.swiftpm/
+
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/

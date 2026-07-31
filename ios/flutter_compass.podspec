@@ -8,15 +8,14 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A Flutter compass. The heading varies from 0-360, 0 being north.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/hemanthrajv/flutter_compass'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  s.public_header_files = 'Classes/**/*.h'
+  s.source_files = 'flutter_compass/Sources/flutter_compass/**/*.swift'
   s.dependency 'Flutter'
-  
-  s.ios.deployment_target = '8.0'
-s.swift_version = '4.2'
-end
 
+  s.ios.deployment_target = '12.0'
+  s.swift_version = '5.0'
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+end

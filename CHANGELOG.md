@@ -1,3 +1,9 @@
+## Unreleased
+* Add Swift Package Manager support for iOS (CocoaPods remains supported)
+* Merge the iOS Objective-C shim into the Swift plugin class, renaming
+  `SwiftFlutterCompassPlugin` to `FlutterCompassPlugin`
+* Raise the iOS deployment target to 12.0 and the Swift version to 5.0
+
 ## 0.8.1
 * Bump the compileSdkVersion to 34 to support Android 14
 * Support the AGP >= 8
