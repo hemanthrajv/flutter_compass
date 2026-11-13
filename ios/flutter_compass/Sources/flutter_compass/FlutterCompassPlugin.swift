@@ -4,7 +4,7 @@ import CoreLocation
 import CoreMotion
 import simd
 
-public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, CLLocationManagerDelegate {
+public class FlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, CLLocationManagerDelegate {
 
     private var eventSink: FlutterEventSink?;
     private var location: CLLocationManager = CLLocationManager();
@@ -24,7 +24,7 @@ public class SwiftFlutterCompassPlugin: NSObject, FlutterPlugin, FlutterStreamHa
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterEventChannel.init(name: "hemanthraj/flutter_compass", binaryMessenger: registrar.messenger())
-    _ = SwiftFlutterCompassPlugin(channel: channel);
+    _ = FlutterCompassPlugin(channel: channel);
   }
 
     public func onListen(withArguments arguments: Any?,

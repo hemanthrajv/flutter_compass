@@ -83,3 +83,7 @@ fastlane/README.md
 .project
 *.bak
 *.classpath
+
+# Swift Package Manager local build state
+.build/
+.swiftpm/
